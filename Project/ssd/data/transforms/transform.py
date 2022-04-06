@@ -156,7 +156,7 @@ class RandomSampleCrop(torch.nn.Module):
 
                 sample["image"] = current_image
                 sample["boxes"] = current_boxes
-                sample["lables"] = current_labels
+                sample["labels"] = current_labels
                 return sample
 
 
@@ -186,3 +186,4 @@ class Resize(torch.nn.Module):
     def forward(self, batch):
         batch["image"] = torchvision.transforms.functional.resize(batch["image"], self.imshape, antialias=True)
         return batch
+
