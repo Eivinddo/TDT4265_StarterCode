@@ -1,7 +1,7 @@
 import torch.nn as nn
 import torch
-import math
 import torch.nn.functional as F
+from tops import to_cuda
 
 
 class SSDFocalLoss(nn.Module):
@@ -41,7 +41,7 @@ class SSDFocalLoss(nn.Module):
             gt_label = [batch_size, num_anchors]
         """
         batch_size, num_classes, num_anchors = confs.shape
-        alpha = torch.ones(num_classes)
+        alpha = to_cuda(torch.ones(num_classes))
         alpha[0] = 0.01
         alpha = alpha.view(1, -1, 1)
         
