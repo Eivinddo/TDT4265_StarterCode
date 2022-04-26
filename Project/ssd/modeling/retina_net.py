@@ -24,7 +24,7 @@ class RetinaNet(nn.Module):
         #self.classification_heads = []
         
         # Notation from "Focal Loss for Dense Object Detection"
-        A = anchors.anchors_xywh.shape[0]           # Num anchors at each feature map
+        A = anchors.num_boxes_per_fmap[0]           # Num anchors at each feature map
         K = self.num_classes                        # Number of classes
         C = self.feature_extractor.fpn_out_channels # Number of channels per feature map
         
