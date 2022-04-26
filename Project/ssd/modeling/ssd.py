@@ -37,6 +37,8 @@ class SSD300(nn.Module):
         for layer in layers:
             for param in layer.parameters():
                 if param.dim() > 1: nn.init.xavier_uniform_(param)
+        
+        
 
     def regress_boxes(self, features):
         locations = []
