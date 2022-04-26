@@ -68,20 +68,20 @@ class FPN(nn.Module):
                 nn.Conv2d(self.resnet_out_channels[-2], self.resnet_out_channels[-2], kernel_size=3, stride=1, padding=1, bias=False),
                 nn.BatchNorm2d(self.resnet_out_channels[-2])
             ),
-            nn.Sequential(
-                nn.Conv2d(self.resnet_out_channels[-2], self.resnet_out_channels[-2], kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(self.resnet_out_channels[-2]),
-                nn.ReLU(inplace=True),
-                nn.Conv2d(self.resnet_out_channels[-2], self.resnet_out_channels[-2], kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(self.resnet_out_channels[-2])
-            ),
-            nn.Sequential(
-                nn.Conv2d(self.resnet_out_channels[-2], self.resnet_out_channels[-2], kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(self.resnet_out_channels[-2]),
-                nn.ReLU(inplace=True),
-                nn.Conv2d(self.resnet_out_channels[-2], self.resnet_out_channels[-2], kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(self.resnet_out_channels[-2])
-            ),
+            #nn.Sequential(
+            #    nn.Conv2d(self.resnet_out_channels[-2], self.resnet_out_channels[-2], kernel_size=3, stride=1, padding=1, bias=False),
+            #    nn.BatchNorm2d(self.resnet_out_channels[-2]),
+            #    nn.ReLU(inplace=True),
+            #    nn.Conv2d(self.resnet_out_channels[-2], self.resnet_out_channels[-2], kernel_size=3, stride=1, padding=1, bias=False),
+            #    nn.BatchNorm2d(self.resnet_out_channels[-2])
+            #),
+            #nn.Sequential(
+            #    nn.Conv2d(self.resnet_out_channels[-2], self.resnet_out_channels[-2], kernel_size=3, stride=1, padding=1, bias=False),
+            #    nn.BatchNorm2d(self.resnet_out_channels[-2]),
+            #    nn.ReLU(inplace=True),
+            #    nn.Conv2d(self.resnet_out_channels[-2], self.resnet_out_channels[-2], kernel_size=3, stride=1, padding=1, bias=False),
+            #    nn.BatchNorm2d(self.resnet_out_channels[-2])
+            #),
             nn.Sequential(
                 nn.Conv2d(self.resnet_out_channels[-2], self.resnet_out_channels[-2], kernel_size=3, stride=1, padding=1, bias=False),
                 nn.BatchNorm2d(self.resnet_out_channels[-2]),
@@ -117,20 +117,20 @@ class FPN(nn.Module):
                 nn.Conv2d(self.resnet_out_channels[-1]*2, self.resnet_out_channels[-1], kernel_size=3, stride=1, padding=1, bias=False),
                 nn.BatchNorm2d(self.resnet_out_channels[-1])
             ),
-            nn.Sequential(
-                nn.Conv2d(self.resnet_out_channels[-1], self.resnet_out_channels[-1], kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(self.resnet_out_channels[-1]),
-                nn.ReLU(inplace=True),
-                nn.Conv2d(self.resnet_out_channels[-1], self.resnet_out_channels[-1], kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(self.resnet_out_channels[-1])
-            ),
-            nn.Sequential(
-                nn.Conv2d(self.resnet_out_channels[-1], self.resnet_out_channels[-1], kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(self.resnet_out_channels[-1]),
-                nn.ReLU(inplace=True),
-                nn.Conv2d(self.resnet_out_channels[-1], self.resnet_out_channels[-1], kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(self.resnet_out_channels[-1])
-            ),
+            #nn.Sequential(
+            #    nn.Conv2d(self.resnet_out_channels[-1], self.resnet_out_channels[-1], kernel_size=3, stride=1, padding=1, bias=False),
+            #    nn.BatchNorm2d(self.resnet_out_channels[-1]),
+            #    nn.ReLU(inplace=True),
+            #    nn.Conv2d(self.resnet_out_channels[-1], self.resnet_out_channels[-1], kernel_size=3, stride=1, padding=1, bias=False),
+            #    nn.BatchNorm2d(self.resnet_out_channels[-1])
+            #),
+            #nn.Sequential(
+            #    nn.Conv2d(self.resnet_out_channels[-1], self.resnet_out_channels[-1], kernel_size=3, stride=1, padding=1, bias=False),
+            #    nn.BatchNorm2d(self.resnet_out_channels[-1]),
+            #    nn.ReLU(inplace=True),
+            #    nn.Conv2d(self.resnet_out_channels[-1], self.resnet_out_channels[-1], kernel_size=3, stride=1, padding=1, bias=False),
+            #    nn.BatchNorm2d(self.resnet_out_channels[-1])
+            #),
             nn.Sequential(
                 nn.Conv2d(self.resnet_out_channels[-1], self.resnet_out_channels[-1], kernel_size=3, stride=1, padding=1, bias=False),
                 nn.BatchNorm2d(self.resnet_out_channels[-1]),
