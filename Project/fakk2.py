@@ -5,45 +5,42 @@ import torch
 import torch.nn as nn
 import torchvision
 
-n = 65520
-b = 32
-c = 9
+# Notation from "Focal Loss for Dense Object Detection"
+A = 9       # Num anchors at each feature map
+K = 9       # Number of classes
+C = 256     # Number of channels per feature map
 
-pk = torch.rand((b, c, n))
-log_pk = torch.rand((b, c, n))
-yk = torch.rand((b, c, n))
-alpha = torch.rand((1,9))
-alpha = alpha.view(1, -1, 1)
+classification_heads = nn.Sequential(
+    nn.Conv2d(C, C, kernel_size=3, padding=1),
+    nn.ReLU(inplace=True),
+    nn.Conv2d(C, C, kernel_size=3, padding=1),
+    nn.ReLU(inplace=True),
+    nn.Conv2d(C, C, kernel_size=3, padding=1),
+    nn.ReLU(inplace=True),
+    nn.Conv2d(C, C, kernel_size=3, padding=1),
+    nn.ReLU(inplace=True),
+    nn.Conv2d(C, K*A, kernel_size=3, padding=1),
+    nn.Sigmoid()
+)
 
+regression_heads = nn.Sequential(
+    nn.Conv2d(C, C, kernel_size=3, padding=1),
+    nn.ReLU(inplace=True),
+    nn.Conv2d(C, C, kernel_size=3, padding=1),
+    nn.ReLU(inplace=True),
+    nn.Conv2d(C, C, kernel_size=3, padding=1),
+    nn.ReLU(inplace=True),
+    nn.Conv2d(C, C, kernel_size=3, padding=1),
+    nn.ReLU(inplace=True),
+    nn.Conv2d(C, 4*A, kernel_size=3, padding=1),
+    nn.Sigmoid()
+)
 
-gamma = 2
-
-print("Shapes:")
-print("pk     ", pk.shape)
-print("log_pk ", log_pk.shape)
-print("yk     ", yk.shape)
-print("alpha  ", alpha.shape)
-
-print("MAGI:")
-focal_loss = - alpha @ ((1-pk) ** gamma).transpose(1,2) @ yk @ log_pk
-
-print()
-print("Test 1")
-
-t = alpha @ ((1-pk) ** gamma)
-print("alpha @ ((1-pk) ** gamma):", (alpha @ ((1-pk) ** gamma)).shape)
-print("t:  ", t.shape)
-#torch.outer(alpha, (1-pk) ** gamma)
-
-print()
-print("Test 2")
-#t2 = t.transpose(0,2)@ yk
-yk2 = yk.transpose(1,2)
-print("yk2:   ", yk2.shape)
-t2 = t @ yk2
-print("alpha @ ((1-pk) ** gamma) @ yk", (t @ yk2).shape)
-
-print()
-print("Test 3")
-focal_loss = t2 @ log_pk
-print("focal_loss:", focal_loss.shape)
+layers = [regression_heads, classification_heads]
+module_children = list(regression_heads.children())
+print(module_children)
+named_params = list(module_children[0].named_parameters())
+print(named_params)
+for layer in layers:
+    for param in layer.parameters():
+        if param.dim() > 1: nn.init.xavier_uniform_(param)
