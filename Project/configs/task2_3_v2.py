@@ -13,6 +13,12 @@ from .tdt4265 import (
     label_map,
     anchors
 )
+
+from .task2_2 import (
+    data_train, 
+    data_val
+)
+
 from tops.config import LazyCall as L
 from ssd.modeling.backbones import FPN
 
