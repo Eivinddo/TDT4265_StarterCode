@@ -32,8 +32,7 @@ anchors = L(AnchorBoxes)(
     scale_size_variance=0.2
 )
 
-backbone = L(FPN)(resnet_variant="resnet18",
-                  pretrained=True,
+backbone = L(FPN)(pretrained=True,
                   fpn_out_channels = 256,
                   output_feature_sizes="${anchors.feature_sizes}")
 
