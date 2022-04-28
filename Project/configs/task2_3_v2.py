@@ -5,8 +5,6 @@ from .tdt4265 import (
     optimizer,
     schedulers,
     model,
-    data_train,
-    data_val,
     val_cpu_transform,
     train_cpu_transform,
     gpu_transform,
@@ -43,5 +41,3 @@ anchors = L(AnchorBoxes)(
     scale_center_variance=0.1,
     scale_size_variance=0.2
 )
-
-""" This code has just the FPN implementation. Nothing is done wrt loss function or optimizer.  There is also no data augmentation."""

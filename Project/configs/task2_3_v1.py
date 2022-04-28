@@ -24,9 +24,6 @@ backbone = L(FPN)(pretrained=True,
                   fpn_out_channels = 256,
                   output_feature_sizes="${anchors.feature_sizes}")
 
-#loss_objective = L(SSDFocalLoss)(anchors="${anchors}", gamma=2)
-
-
 anchors = L(AnchorBoxes)(
     feature_sizes=[[32, 256], [16, 128], [8, 64], [4, 32], [2, 16], [1, 8]],
     # Strides is the number of pixels (in image space) between each spatial position in the feature map
@@ -42,5 +39,3 @@ anchors = L(AnchorBoxes)(
     scale_center_variance=0.1,
     scale_size_variance=0.2
 )
-
-""" This code has just the FPN implementation. Nothing is done wrt loss function or optimizer.  There is also no data augmentation."""
