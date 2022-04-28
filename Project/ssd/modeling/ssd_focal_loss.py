@@ -41,8 +41,8 @@ class SSDFocalLoss(nn.Module):
             gt_label = [batch_size, num_anchors]
         """
         batch_size, num_classes, num_anchors = confs.shape
-        alpha = to_cuda(torch.ones(num_classes))
-        alpha[0] = 0.01
+        alpha = to_cuda(torch.ones(num_classes)*1000)
+        alpha[0] = 10
         alpha = alpha.view(1, -1, 1)
         
         gt_bbox = gt_bbox.transpose(1, 2).contiguous() # reshape to [batch_size, 4, num_anchors]
