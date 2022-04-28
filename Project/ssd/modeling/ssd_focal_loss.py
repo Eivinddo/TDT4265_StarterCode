@@ -44,6 +44,9 @@ class SSDFocalLoss(nn.Module):
         alpha = to_cuda(torch.ones(num_classes)*1000)
         alpha[0] = 10
         alpha = alpha.view(1, -1, 1)
+        print("Alpha:")
+        print(alpha)
+        print(alpha.shape)
         
         gt_bbox = gt_bbox.transpose(1, 2).contiguous() # reshape to [batch_size, 4, num_anchors]
         with torch.no_grad():
@@ -56,7 +59,6 @@ class SSDFocalLoss(nn.Module):
             loss_tmp = torch.sum(y_k * focal, dim=1)
             focal_loss = torch.mean(loss_tmp)
 
-        print("classification loss: ", focal_loss)
         pos_mask = (gt_labels > 0).unsqueeze(1).repeat(1, 4, 1)
         bbox_delta = bbox_delta[pos_mask]
         gt_locations = self._loc_vec(gt_bbox)

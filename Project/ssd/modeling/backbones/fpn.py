@@ -27,7 +27,7 @@ class FPN(nn.Module):
         
         self.resnet_out_channels = [64, 128, 256, 512, 1024, 2048]
         # Get a pretrained ResNet34 model
-        self.feature_extractor = nn.Sequential(*list(torchvision.models.resnet34(pretrained=True).children())[:-2])
+        self.feature_extractor = nn.Sequential(*list(torchvision.models.resnet34(pretrained=pretrained).children())[:-2])
 
         self.feature_extractor.add_module("layer5", nn.Sequential(
             nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1),
