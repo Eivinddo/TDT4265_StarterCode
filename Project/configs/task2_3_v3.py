@@ -5,16 +5,27 @@ from .tdt4265 import (
     optimizer,
     schedulers,
     #model,
-    data_train,
-    data_val,
+    #data_train,
+    #data_val,
     val_cpu_transform,
     train_cpu_transform,
     gpu_transform,
     label_map,
     anchors
 )
+
+from .task2_2 import (
+    data_train, 
+    data_val
+)
+
+
 from tops.config import LazyCall as L
 from ssd.modeling.backbones import FPN
+
+
+
+
 
 anchors = L(AnchorBoxes)(
     feature_sizes=[[32, 256], [16, 128], [8, 64], [4, 32], [2, 16], [1, 8]],

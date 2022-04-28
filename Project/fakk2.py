@@ -38,26 +38,53 @@ regression_heads = nn.Sequential(
 
 layers = [regression_heads, classification_heads]
 
+# print(named_params)
 
-module_children = list(classification_heads.children())
-print(module_children)
-named_params = list(module_children[-2].named_parameters())
+# print("Bias pre")
+# print(bias)
+# print(type(bias))
 
-print(named_params)
-bias = named_params[1]
-print("Bias pre")
-print(bias)
-print(type(bias))
-nn.init.zeros_(bias[1])
-print("Eivin")
-bias[1][0] = 1
-print(bias[1])
-bias[1][0:-1:A] = 1
 
-print("Bias post")
-print(bias)
-print(len(bias[1]))
+
+
+# print("Eivin")
+# bias[1][0] = 1
+# print(bias[1])
+# bias[1][0:-1:A] = 1
+
+# print("Bias post")
+# print(bias)
+# print(len(bias[1]))
 
 for layer in layers:
     for param in layer.parameters():
-        if param.dim() > 1: nn.init.xavier_uniform_(param)
+        # Sorting out the weights
+        if param.dim() > 1: 
+            print(param.shape)
+            nn.init.normal_(param, 0, 0.01)
+        
+        # Sorting out the biases
+        else:
+            nn.init.zeros_(param)
+            print(param.shape)
+
+
+module_children = list(classification_heads.children())
+#print(module_children)
+named_params = list(module_children[-2].named_parameters())
+
+bias = named_params[1]
+array = torch.zeros(K*A)
+
+p = 0.99
+temp = torch.tensor(p*((K-1)/(1-p)))
+b = torch.log(temp)
+array[:A] = b
+
+bias[1].data = array
+
+for layer in layers:
+    for param in layer.parameters():
+        # Sorting out the weights
+        if param.dim() <= 1: 
+            print(param)

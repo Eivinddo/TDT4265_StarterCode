@@ -56,7 +56,7 @@ class SSDFocalLoss(nn.Module):
             loss_tmp = torch.sum(y_k * focal, dim=1)
             focal_loss = torch.mean(loss_tmp)
 
-
+        print("classification loss: ", focal_loss)
         pos_mask = (gt_labels > 0).unsqueeze(1).repeat(1, 4, 1)
         bbox_delta = bbox_delta[pos_mask]
         gt_locations = self._loc_vec(gt_bbox)

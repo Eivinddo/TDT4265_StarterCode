@@ -24,33 +24,33 @@ class RetinaNet(nn.Module):
         #self.classification_heads = []
         
         # Notation from "Focal Loss for Dense Object Detection"
-        A = anchors.num_boxes_per_fmap[0]           # Num anchors at each feature map
-        K = self.num_classes                        # Number of classes
-        C = self.feature_extractor.fpn_out_channels # Number of channels per feature map
+        self.A = anchors.num_boxes_per_fmap[0]           # Num anchors at each feature map
+        self.K = self.num_classes                        # Number of classes
+        self.C = self.feature_extractor.fpn_out_channels # Number of channels per feature map
         
         self.classification_heads = nn.Sequential(
-            nn.Conv2d(C, C, kernel_size=3, padding=1),
+            nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(C, C, kernel_size=3, padding=1),
+            nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(C, C, kernel_size=3, padding=1),
+            nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(C, C, kernel_size=3, padding=1),
+            nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(C, K*A, kernel_size=3, padding=1),
+            nn.Conv2d(self.C, self.K*self.A, kernel_size=3, padding=1),
             nn.Sigmoid()
         )
         
         self.regression_heads = nn.Sequential(
-            nn.Conv2d(C, C, kernel_size=3, padding=1),
+            nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(C, C, kernel_size=3, padding=1),
+            nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(C, C, kernel_size=3, padding=1),
+            nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(C, C, kernel_size=3, padding=1),
+            nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(C, 4*A, kernel_size=3, padding=1),
+            nn.Conv2d(self.C, 4*self.A, kernel_size=3, padding=1),
             nn.Sigmoid()
         )
 
@@ -66,9 +66,31 @@ class RetinaNet(nn.Module):
 
     def _init_weights(self):
         layers = [self.regression_heads, self.classification_heads]
+
         for layer in layers:
             for param in layer.parameters():
-                if param.dim() > 1: nn.init.xavier_uniform_(param)
+                # Sorting out the weights
+                if param.dim() > 1: 
+                    nn.init.normal_(param, 0, 0.01)
+                # Sorting out the biases
+                else:
+                    nn.init.zeros_(param)
+
+        # Extracting last layer of classification heads
+        module_children = list(self.classification_heads.children())
+        # Extracting the last convolutional layer
+        conv_layer = list(module_children[-2].named_parameters())
+
+        bias = conv_layer[1]
+        biasArray = torch.zeros(self.K)
+        p = 0.99
+        b = torch.log(torch.tensor(p*((self.K-1)/(1-p))))
+        biasArray[0] = b
+        biasArray = biasArray.repeat(self.A)
+        bias[1].data = biasArray
+
+
+
 
     def regress_boxes(self, features):
         locations = []

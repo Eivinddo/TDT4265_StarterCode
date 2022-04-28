@@ -27,15 +27,15 @@ class FPN(nn.Module):
         
         self.resnet_out_channels = [64, 128, 256, 512, 1024, 2048]
         # Get a pretrained ResNet34 model
-        feature_extractor = nn.Sequential(*list(torchvision.models.resnet34(pretrained=True).children())[:-2])
+        self.feature_extractor = nn.Sequential(*list(torchvision.models.resnet34(pretrained=True).children())[:-2])
 
-        feature_extractor.add_module("layer5", nn.Sequential(
+        self.feature_extractor.add_module("layer5", nn.Sequential(
             nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.Conv2d(512, 1024, kernel_size=3, stride=2, padding=1),    # Downsample
             nn.ReLU()
         ))
-        feature_extractor.add_module("layer6", nn.Sequential(
+        self.feature_extractor.add_module("layer6", nn.Sequential(
             nn.Conv2d(1024, 1024, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.Conv2d(1024, 2048, kernel_size=3, stride=2, padding=1),    # Downsample
@@ -72,11 +72,11 @@ class FPN(nn.Module):
         pyramid['feat3'] = self.feature_extractor[7](pyramid['feat2'])
         pyramid['feat4'] = self.feature_extractor[8](pyramid['feat3'])
         pyramid['feat5'] = self.feature_extractor[9](pyramid['feat4'])
-        
+
+
         out_features = self.fpn(pyramid).values()
         
         for idx, feature in enumerate(out_features):
-            out_channel = self.out_channels[idx]
             h, w = self.output_feature_shape[idx]
             expected_shape = (self.fpn_out_channels, h, w)
             assert feature.shape[1:] == expected_shape, \
@@ -85,34 +85,3 @@ class FPN(nn.Module):
             f"Expected that the length of the outputted features to be: {len(self.output_feature_shape)}, but it was: {len(out_features)}"
         return tuple(out_features)
 
-#    def forward(self, x):
-#        """
-#        The forward functiom should output features with shape:
-#            [shape(-1, output_channels[0], 38, 38),
-#            shape(-1, output_channels[1], 19, 19),
-#            shape(-1, output_channels[2], 10, 10),
-#            shape(-1, output_channels[3], 5, 5),
-#            shape(-1, output_channels[3], 3, 3),
-#            shape(-1, output_channels[4], 1, 1)]
-#        We have added assertion tests to check this, iteration through out_features,
-#        where out_features[0] should have the shape:
-#            shape(-1, output_channels[0], 38, 38),
-#        """
-#        out_features = []
-#        for i in range(5):
-#            x = self.feature_extractor[i](x)
-#        
-#        out_features.append(self.feature_extractor[4](x))
-#
-#        for i in range(5, len(self.feature_extractor)):
-#            out_features.append(self.feature_extractor[i](out_features[i-5]))
-#
-#        for idx, feature in enumerate(out_features):
-#            out_channel = self.out_channels[idx]
-#            h, w = self.output_feature_shape[idx]
-#            expected_shape = (out_channel, h, w)
-#            assert feature.shape[1:] == expected_shape, \
-#                f"Expected shape: {expected_shape}, got: {feature.shape[1:]} at output IDX: {idx}"
-#        assert len(out_features) == len(self.output_feature_shape),\
-#            f"Expected that the length of the outputted features to be: {len(self.output_feature_shape)}, but it was: {len(out_features)}"
-#        return tuple(out_features)
