@@ -5,14 +5,17 @@ from .tdt4265 import (
     optimizer,
     schedulers,
     model,
-    data_train,
-    data_val,
     val_cpu_transform,
     train_cpu_transform,
     gpu_transform,
     label_map,
     anchors,
     loss_objective
+)
+
+from .task2_2 import (
+    data_train, 
+    data_val
 )
 from tops.config import LazyCall as L
 from ssd.modeling.backbones import FPN
