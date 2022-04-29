@@ -60,8 +60,8 @@ class SSDFocalLoss(nn.Module):
             # print("alpha:  ", alpha.shape)
 
             weight = torch.pow(1. - p_k, self.gamma)
-            focal = -alpha * weight * log_p_k
-            loss_tmp = torch.sum(y_k * focal, dim=1)
+            focal = - y_k * weight * log_p_k
+            loss_tmp = torch.sum(alpha * focal, dim=1)
             focal_loss = torch.mean(loss_tmp)
 
         pos_mask = (gt_labels > 0).unsqueeze(1).repeat(1, 4, 1)
@@ -71,6 +71,8 @@ class SSDFocalLoss(nn.Module):
         regression_loss = F.smooth_l1_loss(bbox_delta, gt_locations, reduction="sum")
         num_pos = gt_locations.shape[0]/4
         total_loss = regression_loss/num_pos + focal_loss
+        print("Regression Loss:", regression_loss/num_pos)
+        print("Focal Loss:     ", focal_loss)
         to_log = dict(
             regression_loss=regression_loss/num_pos,
             classification_loss=focal_loss,
