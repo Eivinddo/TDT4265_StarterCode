@@ -44,15 +44,20 @@ class SSDFocalLoss(nn.Module):
         alpha = to_cuda(torch.ones(num_classes)*1000)
         alpha[0] = 10
         alpha = alpha.view(1, -1, 1)
-        print("Alpha:")
-        print(alpha)
-        print(alpha.shape)
+        # print("Alpha:")
+        # print(alpha)
+        # print(alpha.shape)
         
         gt_bbox = gt_bbox.transpose(1, 2).contiguous() # reshape to [batch_size, 4, num_anchors]
         with torch.no_grad():
             p_k = F.softmax(confs, dim=1)
             log_p_k = F.log_softmax(confs, dim=1)
             y_k = F.one_hot(gt_labels, num_classes).transpose(1, 2)
+
+            # print("p_k:    ", p_k.shape)
+            # print("log_p_k:", log_p_k.shape)
+            # print("y_k:    ", y_k.shape)
+            # print("alpha:  ", alpha.shape)
 
             weight = torch.pow(1. - p_k, self.gamma)
             focal = -alpha * weight * log_p_k
