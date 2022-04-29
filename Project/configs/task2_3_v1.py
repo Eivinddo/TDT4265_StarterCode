@@ -5,11 +5,13 @@ from .tdt4265 import (
     optimizer,
     schedulers,
     model,
+    # data_train,
+    # data_val,
     val_cpu_transform,
     train_cpu_transform,
     gpu_transform,
     label_map,
-    #anchors,
+    # anchors,
     loss_objective
 )
 
@@ -34,8 +36,8 @@ anchors = L(AnchorBoxes)(
     # if ratio=[2], boxes will be created with ratio 1:2 and 2:1
     # Number of boxes per location is in total 2 + 2 per aspect ratio.
     # All feature maps must have same aspect ratio in order to make task 2.3.3 work
-    aspect_ratios=[[2, 3], [2, 3], [2, 3], [2, 3], [2, 3], [2, 3]],
-    # aspect_ratios=[[1.2, 3, 4], [1.2, 3, 4], [1.2, 3, 4], [1.2, 3, 4], [1.2, 3, 4], [1.2, 3, 4]],
+    # aspect_ratios=[[2, 3], [2, 3], [2, 3], [2, 3], [2, 3], [2, 3]],
+    aspect_ratios=[[1.2, 3, 4], [1.2, 3, 4], [1.2, 3, 4], [1.2, 3, 4], [1.2, 3, 4], [1.2, 3, 4]],
     image_shape="${train.imshape}",
     scale_center_variance=0.1,
     scale_size_variance=0.2

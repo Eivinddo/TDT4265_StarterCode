@@ -5,11 +5,14 @@ from .tdt4265 import (
     optimizer,
     schedulers,
     model,
+    # data_train,
+    # data_val,
     val_cpu_transform,
     train_cpu_transform,
     gpu_transform,
     label_map,
-    #anchors
+    # anchors,
+    # loss_objective
 )
 
 from .task2_2 import (
