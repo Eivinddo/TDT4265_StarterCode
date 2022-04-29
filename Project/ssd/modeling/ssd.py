@@ -42,8 +42,8 @@ class SSD300(nn.Module):
         # for layer in layers:
         #     for param in layer.parameters():
         #         if param.dim() > 1: nn.init.xavier_uniform_(param)
-        layers = [*self.regression_heads, *self.classification_heads]
 
+        layers = [*self.regression_heads, *self.classification_heads]
         for layer in layers:
             for param in layer.parameters():
                 # Sorting out the weights
