@@ -1,10 +1,10 @@
 from math import gamma
 from ssd.modeling import backbones, SSDFocalLoss, AnchorBoxes
-from .utils import get_dataset_dir, get_output_dir
 from .tdt4265 import (
     train,
     optimizer,
     schedulers,
+    # backbone,
     model,
     # data_train,
     # data_val,

@@ -4,6 +4,7 @@ from .tdt4265 import (
     train,
     optimizer,
     schedulers,
+    # backbone,
     # model,
     # data_train,
     # data_val,
