@@ -12,8 +12,8 @@ from .tdt4265 import (
     train_cpu_transform,
     gpu_transform,
     label_map,
-    # anchors
-    # loss_objective
+    # anchors,
+    # loss_objective,
 )
 
 from .task2_2 import (

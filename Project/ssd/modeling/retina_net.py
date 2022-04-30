@@ -20,14 +20,15 @@ class RetinaNet(nn.Module):
         self.loss_func = loss_objective
         self.num_classes = num_classes
         
-        #self.regression_heads = []
-        #self.classification_heads = []
+        # self.regression_heads = []
+        # self.classification_heads = []
         
         # Notation from "Focal Loss for Dense Object Detection"
         self.A = anchors.num_boxes_per_fmap[0]           # Num anchors at each feature map
         self.K = self.num_classes                        # Number of classes
         self.C = self.feature_extractor.fpn_out_channels # Number of channels per feature map
-        
+
+        # Initialize output heads that are applied to each feature map from the backbone.
         self.classification_heads = nn.Sequential(
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
@@ -38,7 +39,7 @@ class RetinaNet(nn.Module):
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
             nn.Conv2d(self.C, self.K*self.A, kernel_size=3, padding=1),
-            nn.Sigmoid()
+            nn.ReLU(inplace=True)
         )
         
         self.regression_heads = nn.Sequential(
@@ -51,46 +52,43 @@ class RetinaNet(nn.Module):
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
             nn.Conv2d(self.C, 4*self.A, kernel_size=3, padding=1),
-            nn.Sigmoid()
+            nn.ReLU(inplace=True)
         )
-
-        # Initialize output heads that are applied to each feature map from the backbone.
-        #for n_boxes, out_ch in zip(anchors.num_boxes_per_fmap, self.feature_extractor.out_channels):
-        #    self.regression_heads.append(nn.Conv2d(out_ch, n_boxes * 4, kernel_size=3, padding=1))
-        #    self.classification_heads.append(nn.Conv2d(out_ch, n_boxes * self.num_classes, kernel_size=3, padding=1))
-
-        #self.regression_heads = nn.ModuleList(self.regression_heads)
-        #self.classification_heads = nn.ModuleList(self.classification_heads)
+    
+        # self.regression_heads = nn.ModuleList(self.regression_heads)
+        # self.classification_heads = nn.ModuleList(self.classification_heads)
         self.anchor_encoder = AnchorEncoder(anchors)
         self._init_weights()
 
     def _init_weights(self):
         layers = [self.regression_heads, self.classification_heads]
-
         for layer in layers:
             for param in layer.parameters():
-                # Sorting out the weights
-                if param.dim() > 1: 
-                    nn.init.normal_(param, 0, 0.01)
-                # Sorting out the biases
-                else:
-                    nn.init.zeros_(param)
+                if param.dim() > 1: nn.init.xavier_uniform_(param)
 
-        # Extracting last layer of classification heads
-        module_children = list(self.classification_heads.children())
-        # Extracting the last convolutional layer
-        conv_layer = list(module_children[-2].named_parameters())
+        # layers = [*self.regression_heads, *self.classification_heads]
+        # for layer in layers:
+        #     for param in layer.parameters():
+        #         # Sorting out the weights
+        #         if param.dim() > 1: 
+        #             nn.init.normal_(param, 0, 0.01)
+        #         # Sorting out the biases
+        #         else:
+        #             nn.init.zeros_(param)
 
-        bias = conv_layer[1]
-        biasArray = torch.zeros(self.K)
-        p = 0.99
-        b = torch.log(torch.tensor(p*((self.K-1)/(1-p))))
-        biasArray[0] = b
-        biasArray = biasArray.repeat(self.A)
-        bias[1].data = biasArray
+        # # Extracting last layer of classification heads
+        # module_children = list(self.classification_heads.children())
+        # print("SER HEEER:", len(module_children))
+        # # Extracting the last convolutional layer
+        # conv_layer = list(module_children[-2].named_parameters())
 
-
-
+        # bias = conv_layer[1]
+        # biasArray = torch.zeros(self.K)
+        # p = 0.99
+        # b = torch.log(torch.tensor(p*((self.K-1)/(1-p))))
+        # biasArray[0] = b
+        # biasArray = biasArray.repeat(self.A)
+        # bias[1].data = biasArray
 
     def regress_boxes(self, features):
         locations = []
