@@ -9,7 +9,8 @@ class RetinaNet(nn.Module):
             feature_extractor: nn.Module,
             anchors,
             loss_objective,
-            num_classes: int):
+            num_classes: int,
+            anchor_prob_initialization: bool = True):
         super().__init__()
         """
             Implements the RetinaNet network, based on SSD.
@@ -19,9 +20,7 @@ class RetinaNet(nn.Module):
         self.feature_extractor = feature_extractor
         self.loss_func = loss_objective
         self.num_classes = num_classes
-        
-        # self.regression_heads = []
-        # self.classification_heads = []
+        self.anchor_prob_initialization = anchor_prob_initialization
         
         # Notation from "Focal Loss for Dense Object Detection"
         self.A = anchors.num_boxes_per_fmap[0]           # Num anchors at each feature map
@@ -55,40 +54,38 @@ class RetinaNet(nn.Module):
             nn.ReLU(inplace=True)
         )
     
-        # self.regression_heads = nn.ModuleList(self.regression_heads)
-        # self.classification_heads = nn.ModuleList(self.classification_heads)
         self.anchor_encoder = AnchorEncoder(anchors)
         self._init_weights()
 
     def _init_weights(self):
-        layers = [self.regression_heads, self.classification_heads]
-        for layer in layers:
-            for param in layer.parameters():
-                if param.dim() > 1: nn.init.xavier_uniform_(param)
+        if self.anchor_prob_initialization:
+            layers = [*self.regression_heads, *self.classification_heads]
+            for layer in layers:
+                for param in layer.parameters():
+                    # Sorting out the weights
+                    if param.dim() > 1: 
+                        nn.init.normal_(param, 0, 0.01)
+                    # Sorting out the biases
+                    else:
+                        nn.init.zeros_(param)
 
-        # layers = [*self.regression_heads, *self.classification_heads]
-        # for layer in layers:
-        #     for param in layer.parameters():
-        #         # Sorting out the weights
-        #         if param.dim() > 1: 
-        #             nn.init.normal_(param, 0, 0.01)
-        #         # Sorting out the biases
-        #         else:
-        #             nn.init.zeros_(param)
+            # Extracting last layer of classification heads
+            module_children = list(self.classification_heads.children())
+            # Extracting the last convolutional layer
+            conv_layer = list(module_children[-2].named_parameters())
 
-        # # Extracting last layer of classification heads
-        # module_children = list(self.classification_heads.children())
-        # print("SER HEEER:", len(module_children))
-        # # Extracting the last convolutional layer
-        # conv_layer = list(module_children[-2].named_parameters())
-
-        # bias = conv_layer[1]
-        # biasArray = torch.zeros(self.K)
-        # p = 0.99
-        # b = torch.log(torch.tensor(p*((self.K-1)/(1-p))))
-        # biasArray[0] = b
-        # biasArray = biasArray.repeat(self.A)
-        # bias[1].data = biasArray
+            bias = conv_layer[1]
+            biasArray = torch.zeros(self.K)
+            p = 0.99
+            b = torch.log(torch.tensor(p*((self.K-1)/(1-p))))
+            biasArray[0] = b
+            biasArray = biasArray.repeat(self.A)
+            bias[1].data = biasArray
+        else:
+            layers = [self.regression_heads, self.classification_heads]
+            for layer in layers:
+                for param in layer.parameters():
+                    if param.dim() > 1: nn.init.xavier_uniform_(param)
 
     def regress_boxes(self, features):
         locations = []
@@ -101,7 +98,6 @@ class RetinaNet(nn.Module):
         bbox_delta = torch.cat(locations, 2).contiguous()
         confidences = torch.cat(confidences, 2).contiguous()
         return bbox_delta, confidences
-
     
     def forward(self, img: torch.Tensor, **kwargs):
         """

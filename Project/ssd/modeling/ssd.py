@@ -9,7 +9,8 @@ class SSD300(nn.Module):
             feature_extractor: nn.Module,
             anchors,
             loss_objective,
-            num_classes: int):
+            num_classes: int,
+            anchor_prob_initialization: bool = True):
         super().__init__()
         """
             Implements the SSD network.
@@ -19,6 +20,7 @@ class SSD300(nn.Module):
         self.feature_extractor = feature_extractor
         self.loss_func = loss_objective
         self.num_classes = num_classes
+        self.anchor_prob_initialization = anchor_prob_initialization
         self.regression_heads = []
         self.classification_heads = []
 
@@ -38,34 +40,34 @@ class SSD300(nn.Module):
         self._init_weights()
 
     def _init_weights(self):
-        # layers = [*self.regression_heads, *self.classification_heads]
-        # for layer in layers:
-        #     for param in layer.parameters():
-        #         if param.dim() > 1: nn.init.xavier_uniform_(param)
+        if self.anchor_prob_initialization:
+            layers = [*self.regression_heads, *self.classification_heads]
+            for layer in layers:
+                for param in layer.parameters():
+                    # Sorting out the weights
+                    if param.dim() > 1: 
+                        nn.init.normal_(param, 0, 0.01)
+                    # Sorting out the biases
+                    else:
+                        nn.init.zeros_(param)
 
-        layers = [*self.regression_heads, *self.classification_heads]
-        for layer in layers:
-            for param in layer.parameters():
-                # Sorting out the weights
-                if param.dim() > 1: 
-                    nn.init.normal_(param, 0, 0.01)
-                # Sorting out the biases
-                else:
-                    nn.init.zeros_(param)
+            # Extracting last layer of classification heads
+            module_children = list(self.classification_heads.children())
+            # Extracting the last convolutional layer
+            conv_layer = list(module_children[-2].named_parameters())
 
-        # Extracting last layer of classification heads
-        module_children = list(self.classification_heads.children())
-        # Extracting the last convolutional layer
-        conv_layer = list(module_children[-2].named_parameters())
-
-        bias = conv_layer[1]
-        biasArray = torch.zeros(self.K*self.A)
-        p = 0.99
-        b = torch.log(torch.tensor(p*((self.K-1)/(1-p))))
-        biasArray[:self.A] = b
-        bias[1].data = biasArray
+            bias = conv_layer[1]
+            biasArray = torch.zeros(self.K*self.A)
+            p = 0.99
+            b = torch.log(torch.tensor(p*((self.K-1)/(1-p))))
+            biasArray[:self.A] = b
+            bias[1].data = biasArray
+        else:
+            layers = [*self.regression_heads, *self.classification_heads]
+            for layer in layers:
+                for param in layer.parameters():
+                    if param.dim() > 1: nn.init.xavier_uniform_(param)
         
-
     def regress_boxes(self, features):
         locations = []
         confidences = []
