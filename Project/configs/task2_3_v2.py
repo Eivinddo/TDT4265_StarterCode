@@ -24,6 +24,9 @@ from .task2_2 import (
 from tops.config import LazyCall as L
 from ssd.modeling.backbones import FPN
 
+# Initialization of weights. Default: True.
+model.anchor_prob_initialization = False
+
 loss_objective = L(SSDFocalLoss)(anchors="${anchors}", gamma=2)
 
 backbone = L(FPN)(pretrained=True,
