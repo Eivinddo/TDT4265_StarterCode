@@ -15,10 +15,10 @@ model.num_classes = 8 + 1  # Add 1 for background class
 
 
 train_cpu_transform = L(torchvision.transforms.Compose)(transforms=[
-    # L(RandomSampleCrop)(),
+    L(RandomSampleCrop)(),
     L(ToTensor)(),
     L(Resize)(imshape="${train.imshape}"),
-    # L(RandomHorizontalFlip)(),
+    L(RandomHorizontalFlip)(),
     L(GroundTruthBoxesToAnchors)(anchors="${anchors}", iou_threshold=0.5),
 ])
 val_cpu_transform = L(torchvision.transforms.Compose)(transforms=[
@@ -37,7 +37,7 @@ data_val.dataset = L(TDT4265Dataset)(
     img_folder=get_dataset_dir("tdt4265_2022"),
     transform="${val_cpu_transform}",
     annotation_file=get_dataset_dir("tdt4265_2022/val_annotations.json"))
-    
+
 data_val.gpu_transform = gpu_transform
 data_train.gpu_transform = gpu_transform
 
