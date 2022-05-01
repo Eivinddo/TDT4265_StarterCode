@@ -37,7 +37,7 @@ data_val.dataset = L(TDT4265Dataset)(
     img_folder=get_dataset_dir("tdt4265_2022"),
     transform="${val_cpu_transform}",
     annotation_file=get_dataset_dir("tdt4265_2022/val_annotations.json"))
-    
+
 data_val.gpu_transform = gpu_transform
 data_train.gpu_transform = gpu_transform
 
