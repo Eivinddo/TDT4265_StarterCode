@@ -35,7 +35,7 @@ model = L(RetinaNet)(
     anchors="${anchors}",
     loss_objective="${loss_objective}",
     num_classes=8+1,  # Add 1 for background
-    anchor_prob_initialization=True
+    anchor_prob_initialization=False
 )
 
 anchors = L(AnchorBoxes)(
