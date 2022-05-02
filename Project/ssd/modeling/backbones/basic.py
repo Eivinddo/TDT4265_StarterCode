@@ -1,7 +1,6 @@
 import torch
 from typing import Tuple, List
 
-
 class BasicModel(torch.nn.Module):
     """
     This is a basic backbone for SSD.
@@ -55,8 +54,6 @@ class BasicModel(torch.nn.Module):
             ),
             torch.nn.ReLU()
         )
-
-
 
         self.feature_extractor_one = torch.nn.Sequential(
             torch.nn.ReLU(),
