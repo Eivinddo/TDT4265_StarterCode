@@ -37,8 +37,7 @@ class RetinaNet(nn.Module):
             nn.ReLU(inplace=True),
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(self.C, self.K*self.A, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True)
+            nn.Conv2d(self.C, self.K*self.A, kernel_size=3, padding=1)
         )
         
         self.regression_heads = nn.Sequential(
@@ -50,8 +49,7 @@ class RetinaNet(nn.Module):
             nn.ReLU(inplace=True),
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(self.C, 4*self.A, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True)
+            nn.Conv2d(self.C, 4*self.A, kernel_size=3, padding=1)
         )
     
         self.anchor_encoder = AnchorEncoder(anchors)
