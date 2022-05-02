@@ -10,7 +10,7 @@ class RetinaNet(nn.Module):
             anchors,
             loss_objective,
             num_classes: int,
-            anchor_prob_initialization: bool = True):
+            anchor_prob_initialization: bool = False):
         super().__init__()
         """
             Implements the RetinaNet network, based on SSD.
@@ -23,7 +23,7 @@ class RetinaNet(nn.Module):
         self.anchor_prob_initialization = anchor_prob_initialization
         
         # Notation from "Focal Loss for Dense Object Detection"
-        self.A = anchors.num_boxes_per_fmap[0]           # Num anchors at each feature map
+        self.A = anchors.num_boxes_per_fmap[-1]           # Num anchors at each feature map
         self.K = self.num_classes                        # Number of classes
         self.C = self.feature_extractor.fpn_out_channels # Number of channels per feature map
 
@@ -37,8 +37,7 @@ class RetinaNet(nn.Module):
             nn.ReLU(inplace=True),
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(self.C, self.K*self.A, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True)
+            nn.Conv2d(self.C, self.K*self.A, kernel_size=3, padding=1)
         )
         
         self.regression_heads = nn.Sequential(
@@ -50,8 +49,7 @@ class RetinaNet(nn.Module):
             nn.ReLU(inplace=True),
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(self.C, 4*self.A, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True)
+            nn.Conv2d(self.C, 4*self.A, kernel_size=3, padding=1)
         )
     
         self.anchor_encoder = AnchorEncoder(anchors)
@@ -59,28 +57,26 @@ class RetinaNet(nn.Module):
 
     def _init_weights(self):
         if self.anchor_prob_initialization:
-            layers = [*self.regression_heads, *self.classification_heads]
-            for layer in layers:
-                for param in layer.parameters():
-                    # Sorting out the weights
-                    if param.dim() > 1: 
-                        nn.init.normal_(param, 0, 0.01)
-                    # Sorting out the biases
-                    else:
-                        nn.init.zeros_(param)
 
-            # Extracting last layer of classification heads
-            module_children = list(self.classification_heads.children())
-            # Extracting the last convolutional layer
-            conv_layer = list(module_children[-2].named_parameters())
+            # Init classification heads
+            for layer in self.classification_heads:
+                if hasattr(layer, "weight"):
+                    nn.init.normal_(layer.weight.data, 0, 0.01)
+                if hasattr(layer, "bias"):
+                    nn.init.constant_(layer.bias.data, 0)
 
-            bias = conv_layer[1]
-            biasArray = torch.zeros(self.K)
+            # Init regression heads
+            for layer in self.regression_heads:
+                if hasattr(layer, "weight"):
+                    nn.init.normal_(layer.weight.data, 0, 0.01)
+                if hasattr(layer, "bias"):
+                    nn.init.constant_(layer.bias.data, 0)
+            
             p = 0.99
-            b = torch.log(torch.tensor(p*((self.K-1)/(1-p))))
-            biasArray[0] = b
-            biasArray = biasArray.repeat(self.A)
-            bias[1].data = biasArray
+            b = torch.log(torch.tensor(-(1-0.01/0.01)))
+            #b = torch.log(torch.tensor(p*((self.K-1)/(1-p))))
+            nn.init.constant_(self.regression_heads[-1].bias.data[:self.A],b)
+
         else:
             layers = [self.regression_heads, self.classification_heads]
             for layer in layers:
