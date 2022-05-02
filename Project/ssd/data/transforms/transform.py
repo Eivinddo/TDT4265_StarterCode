@@ -187,3 +187,31 @@ class Resize(torch.nn.Module):
         batch["image"] = torchvision.transforms.functional.resize(batch["image"], self.imshape, antialias=True)
         return batch
 
+class RandomContrast(torch.nn.Module):
+
+    def __init__(self, lower=0.5, upper=2, p=0.1) -> None:
+        super().__init__()
+        self.lower = lower
+        self.upper = upper
+        self.p = p
+
+    def __call__(self, batch):
+        if np.random.uniform() < self.p:
+            contrast_factor = random.uniform(self.lower, self.upper)
+            batch["image"] = torchvision.transforms.functional.adjust_contrast(batch["image"], contrast_factor)
+        return batch  
+
+
+class RandomBrightness(torch.nn.Module):
+
+    def __init__(self, lower=0.5, upper=2, p=0.1) -> None:
+        super().__init__()
+        self.lower = lower
+        self.upper = upper
+        self.p = p
+
+    def __call__(self, batch):
+        if np.random.uniform() < self.p:
+            brightness_factor = random.uniform(self.lower, self.upper)
+            batch["image"] = torchvision.transforms.functional.adjust_brightness(batch["image"], brightness_factor)
+        return batch
