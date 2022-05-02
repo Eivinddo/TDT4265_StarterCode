@@ -215,3 +215,15 @@ class RandomBrightness(torch.nn.Module):
             brightness_factor = random.uniform(self.lower, self.upper)
             batch["image"] = torchvision.transforms.functional.adjust_brightness(batch["image"], brightness_factor)
         return batch
+
+
+class GaussianBlur(torch.nn.Module):
+
+    def __init__(self, imshape) -> None:
+        super().__init__()
+        self.imshape = tuple(imshape)
+
+    @torch.no_grad()
+    def forward(self, batch):
+        batch["image"] = torchvision.transforms.functional.resize(batch["image"], self.imshape, antialias=True)
+        return batch
