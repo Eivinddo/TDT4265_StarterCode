@@ -187,7 +187,6 @@ class Resize(torch.nn.Module):
         batch["image"] = torchvision.transforms.functional.resize(batch["image"], self.imshape, antialias=True)
         return batch
 
-
 class RandomContrast(torch.nn.Module):
 
     def __init__(self, lower=0.5, upper=2, p=0.1) -> None:
@@ -215,32 +214,16 @@ class RandomBrightness(torch.nn.Module):
         if np.random.uniform() < self.p:
             brightness_factor = random.uniform(self.lower, self.upper)
             batch["image"] = torchvision.transforms.functional.adjust_brightness(batch["image"], brightness_factor)
-        return batch  
+        return batch
 
 
-# class Dropout(torch.nn.Module):
+class GaussianBlur(torch.nn.Module):
 
-#     def __init__(self, p=0.1) -> None:
-#         super().__init__()
-#         self.p = p
+    def __init__(self, imshape) -> None:
+        super().__init__()
+        self.imshape = tuple(imshape)
 
-#     def __call__(self, batch):
-#         if np.random.uniform() < self.p:
-#             batch["image"] = torch.nn.Dropout(batch["image"])
-#         return batch  
-
-
-
-
-# GaussianBlur(kernel_size[, sigma])
-# class GaussianBlur(torch.nn.Module):
-
-#     def __init__(self, imshape) -> None:
-#         super().__init__()
-#         self.imshape = tuple(imshape)
-
-#     @torch.no_grad()
-#     def forward(self, batch):
-#         batch["image"] = torchvision.transforms.functional.resize(batch["image"], self.imshape, antialias=True)
-#         return batch
-
+    @torch.no_grad()
+    def forward(self, batch):
+        batch["image"] = torchvision.transforms.functional.resize(batch["image"], self.imshape, antialias=True)
+        return batch

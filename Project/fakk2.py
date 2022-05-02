@@ -5,45 +5,86 @@ import torch
 import torch.nn as nn
 import torchvision
 
-n = 65520
-b = 32
-c = 9
+# Notation from "Focal Loss for Dense Object Detection"
+A = 6       # Num anchors at each feature map
+K = 9       # Number of classes
+C = 256     # Number of channels per feature map
 
-pk = torch.rand((b, c, n))
-log_pk = torch.rand((b, c, n))
-yk = torch.rand((b, c, n))
-alpha = torch.rand((1,9))
-alpha = alpha.view(1, -1, 1)
+classification_heads = nn.Sequential(
+    nn.Conv2d(C, C, kernel_size=3, padding=1),
+    nn.ReLU(inplace=True),
+    nn.Conv2d(C, C, kernel_size=3, padding=1),
+    nn.ReLU(inplace=True),
+    nn.Conv2d(C, C, kernel_size=3, padding=1),
+    nn.ReLU(inplace=True),
+    nn.Conv2d(C, C, kernel_size=3, padding=1),
+    nn.ReLU(inplace=True),
+    nn.Conv2d(C, K*A, kernel_size=3, padding=1),
+    nn.Sigmoid()
+)
+
+regression_heads = nn.Sequential(
+    nn.Conv2d(C, C, kernel_size=3, padding=1),
+    nn.ReLU(inplace=True),
+    nn.Conv2d(C, C, kernel_size=3, padding=1),
+    nn.ReLU(inplace=True),
+    nn.Conv2d(C, C, kernel_size=3, padding=1),
+    nn.ReLU(inplace=True),
+    nn.Conv2d(C, C, kernel_size=3, padding=1),
+    nn.ReLU(inplace=True),
+    nn.Conv2d(C, 4*A, kernel_size=3, padding=1),
+    nn.Sigmoid()
+)
+
+layers = [regression_heads, classification_heads]
+
+# print(named_params)
+
+# print("Bias pre")
+# print(bias)
+# print(type(bias))
 
 
-gamma = 2
 
-print("Shapes:")
-print("pk     ", pk.shape)
-print("log_pk ", log_pk.shape)
-print("yk     ", yk.shape)
-print("alpha  ", alpha.shape)
 
-print("MAGI:")
-focal_loss = - alpha @ ((1-pk) ** gamma).transpose(1,2) @ yk @ log_pk
+# print("Eivin")
+# bias[1][0] = 1
+# print(bias[1])
+# bias[1][0:-1:A] = 1
 
-print()
-print("Test 1")
+# print("Bias post")
+# print(bias)
+# print(len(bias[1]))
 
-t = alpha @ ((1-pk) ** gamma)
-print("alpha @ ((1-pk) ** gamma):", (alpha @ ((1-pk) ** gamma)).shape)
-print("t:  ", t.shape)
-#torch.outer(alpha, (1-pk) ** gamma)
+for layer in layers:
+    for param in layer.parameters():
+        # Sorting out the weights
+        if param.dim() > 1: 
+            print(param.shape)
+            nn.init.normal_(param, 0, 0.01)
+        
+        # Sorting out the biases
+        else:
+            nn.init.zeros_(param)
+            print(param.shape)
 
-print()
-print("Test 2")
-#t2 = t.transpose(0,2)@ yk
-yk2 = yk.transpose(1,2)
-print("yk2:   ", yk2.shape)
-t2 = t @ yk2
-print("alpha @ ((1-pk) ** gamma) @ yk", (t @ yk2).shape)
 
-print()
-print("Test 3")
-focal_loss = t2 @ log_pk
-print("focal_loss:", focal_loss.shape)
+module_children = list(classification_heads.children())
+#print(module_children)
+named_params = list(module_children[-2].named_parameters())
+
+bias = named_params[1]
+array = torch.zeros(K*A)
+
+p = 0.99
+temp = torch.tensor(p*((K-1)/(1-p)))
+b = torch.log(temp)
+array[:A] = b
+
+bias[1].data = array
+
+for layer in layers:
+    for param in layer.parameters():
+        # Sorting out the weights
+        if param.dim() <= 1: 
+            print(param)
