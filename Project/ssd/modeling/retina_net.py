@@ -10,7 +10,7 @@ class RetinaNet(nn.Module):
             anchors,
             loss_objective,
             num_classes: int,
-            anchor_prob_initialization: bool = True):
+            anchor_prob_initialization: bool = False):
         super().__init__()
         """
             Implements the RetinaNet network, based on SSD.
@@ -23,7 +23,7 @@ class RetinaNet(nn.Module):
         self.anchor_prob_initialization = anchor_prob_initialization
         
         # Notation from "Focal Loss for Dense Object Detection"
-        self.A = anchors.num_boxes_per_fmap[0]           # Num anchors at each feature map
+        self.A = anchors.num_boxes_per_fmap[-1]           # Num anchors at each feature map
         self.K = self.num_classes                        # Number of classes
         self.C = self.feature_extractor.fpn_out_channels # Number of channels per feature map
 
@@ -73,7 +73,8 @@ class RetinaNet(nn.Module):
                     nn.init.constant_(layer.bias.data, 0)
             
             p = 0.99
-            b = torch.log(torch.tensor(p*((self.K-1)/(1-p))))
+            b = torch.log(torch.tensor(-(1-0.01/0.01)))
+            #b = torch.log(torch.tensor(p*((self.K-1)/(1-p))))
             nn.init.constant_(self.regression_heads[-1].bias.data[:self.A],b)
 
         else:

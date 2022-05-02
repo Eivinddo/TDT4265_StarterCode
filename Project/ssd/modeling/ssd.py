@@ -10,7 +10,7 @@ class SSD300(nn.Module):
             anchors,
             loss_objective,
             num_classes: int,
-            anchor_prob_initialization: bool = True):
+            anchor_prob_initialization: bool = False):
         super().__init__()
         """
             Implements the SSD network.
@@ -25,9 +25,9 @@ class SSD300(nn.Module):
         self.classification_heads = []
 
         # Notation from "Focal Loss for Dense Object Detection"
-        self.A = anchors.num_boxes_per_fmap[0]           # Num anchors at each feature map
+        self.A = anchors.num_boxes_per_fmap[-1]           # Num anchors at each feature map
         self.K = self.num_classes                        # Number of classes
-        self.C = self.feature_extractor.fpn_out_channels # Number of channels per feature map
+        # self.C = self.feature_extractor.fpn_out_channels # Number of channels per feature map
 
         # Initialize output heads that are applied to each feature map from the backbone.
         for n_boxes, out_ch in zip(anchors.num_boxes_per_fmap, self.feature_extractor.out_channels):

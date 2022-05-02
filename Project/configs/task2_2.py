@@ -3,8 +3,8 @@ import torchvision
 from ssd.data import TDT4265Dataset
 from tops.config import LazyCall as L
 from ssd.data.transforms import (
-    ToTensor, Normalize, Resize, RandomHorizontalFlip, RandomSampleCrop,
-    RandomBrightness, RandomContrast, GaussianBlur, GroundTruthBoxesToAnchors)
+    ToTensor, Normalize, Resize, RandomHorizontalFlip, RandomSampleCrop, GroundTruthBoxesToAnchors, 
+    RandomBrightness, RandomContrast, GaussianBlur)
 from .ssd300 import train, anchors, optimizer, schedulers, backbone, model, data_train, data_val, loss_objective
 from .utils import get_dataset_dir
 
@@ -18,8 +18,8 @@ model.num_classes = 8 + 1  # Add 1 for background class
 train_cpu_transform = L(torchvision.transforms.Compose)(transforms=[
     L(RandomSampleCrop)(),
     L(ToTensor)(),
-    L(RandomContrast)(),
-    L(RandomBrightness)(),
+    # L(RandomContrast)(),
+    # L(RandomBrightness)(),
     L(Resize)(imshape="${train.imshape}"),
     L(RandomHorizontalFlip)(),
     L(GroundTruthBoxesToAnchors)(anchors="${anchors}", iou_threshold=0.5),
@@ -34,9 +34,11 @@ train_gpu_transform = L(torchvision.transforms.Compose)(transforms=[
     L(GaussianBlur)(imshape="${train.imshape}"),
     L(Normalize)(mean=[0.4765, 0.4774, 0.2259], std=[0.2951, 0.2864, 0.2878])
 ])
+
 val_gpu_transform = L(torchvision.transforms.Compose)(transforms=[
     L(Normalize)(mean=[0.4765, 0.4774, 0.2259], std=[0.2951, 0.2864, 0.2878])
 ])
+
 data_train.dataset = L(TDT4265Dataset)(
     img_folder=get_dataset_dir("tdt4265_2022"),
     transform="${train_cpu_transform}",
