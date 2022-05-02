@@ -1,7 +1,6 @@
 import torch
 from typing import Tuple, List
 
-
 class BasicModel(torch.nn.Module):
     """
     This is a basic backbone for SSD.
