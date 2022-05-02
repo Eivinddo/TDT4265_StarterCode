@@ -10,7 +10,7 @@ class RetinaNet(nn.Module):
             anchors,
             loss_objective,
             num_classes: int,
-            anchor_prob_initialization: bool = True):
+            anchor_prob_initialization: bool = False):
         super().__init__()
         """
             Implements the RetinaNet network, based on SSD.

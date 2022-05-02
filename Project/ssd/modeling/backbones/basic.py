@@ -56,8 +56,6 @@ class BasicModel(torch.nn.Module):
             torch.nn.ReLU()
         )
 
-
-
         self.feature_extractor_one = torch.nn.Sequential(
             torch.nn.ReLU(),
             torch.nn.Conv2d(
