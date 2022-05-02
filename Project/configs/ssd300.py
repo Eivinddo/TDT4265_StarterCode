@@ -48,7 +48,7 @@ model = L(SSD300)(
     feature_extractor="${backbone}",
     anchors="${anchors}",
     loss_objective="${loss_objective}",
-    num_classes=8 + 1  # Add 1 for background (Message from ørjan: This was 10+1 before)
+    num_classes=8 + 1  # Add 1 for background
 )
 
 optimizer = L(torch.optim.SGD)(
@@ -59,7 +59,6 @@ schedulers = dict(
     linear=L(LinearLR)(start_factor=0.1, end_factor=1, total_iters=500),
     multistep=L(MultiStepLR)(milestones=[], gamma=0.1)
 )
-
 
 data_train = dict(
     dataset=L(TDT4265Dataset)(
