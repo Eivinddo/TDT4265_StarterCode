@@ -73,9 +73,8 @@ class RetinaNet(nn.Module):
                     nn.init.constant_(layer.bias.data, 0)
             
             p = 0.99
-            b = torch.log(torch.tensor(-(1-0.01/0.01)))
-            #b = torch.log(torch.tensor(p*((self.K-1)/(1-p))))
-            nn.init.constant_(self.regression_heads[-1].bias.data[:self.A],b)
+            b = torch.log(torch.tensor(-p/(1 - p)))
+            nn.init.constant_(self.regression_heads[-1].bias.data[:self.A], b)
 
         else:
             layers = [self.regression_heads, self.classification_heads]
