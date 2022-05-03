@@ -58,8 +58,10 @@ class SSD300(nn.Module):
 
             bias = conv_layer[1]
             biasArray = torch.zeros(self.K*self.A)
+
             p = 0.99
-            b = torch.log(torch.tensor(p*((self.K-1)/(1-p))))
+            b = torch.log(torch.tensor(-p/(1 - p)))
+            
             biasArray[:self.A] = b
             bias[1].data = biasArray
         else:
