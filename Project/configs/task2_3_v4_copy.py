@@ -16,7 +16,7 @@ from .tdt4265 import (
     # loss_objective,
 )
 
-from .task2_2 import (
+from .task2_2_copy import (
     data_train, 
     data_val,
     label_map,
@@ -26,6 +26,7 @@ from .task2_2 import (
 
 from tops.config import LazyCall as L
 from ssd.modeling.backbones import FPN
+
 
 anchors = L(AnchorBoxes)(
     feature_sizes=[[32, 256], [16, 128], [8, 64], [4, 32], [2, 16], [1, 8]],
@@ -50,6 +51,5 @@ model = L(RetinaNet)(
     anchors="${anchors}",
     loss_objective="${loss_objective}",
     num_classes=8+1,  # Add 1 for background
-    anchor_prob_initialization=False
+    anchor_prob_initialization=True
 )
-

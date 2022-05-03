@@ -33,11 +33,6 @@ anchors = L(AnchorBoxes)(
     # Strides is the number of pixels (in image space) between each spatial position in the feature map
     strides=[[4, 4], [8, 8], [16, 16], [32, 32], [64, 64], [128, 128]],
     min_sizes=[[16, 16], [32, 32], [48, 48], [64, 64], [86, 86], [128, 128], [128, 400]],
-    # aspect ratio is defined per feature map (first index is largest feature map (38x38))
-    # aspect ratio is used to define two boxes per element in the list.
-    # if ratio=[2], boxes will be created with ratio 1:2 and 2:1
-    # Number of boxes per location is in total 2 + 2 per aspect ratio.
-    # All feature maps must have same aspect ratio in order to make task 2.3.3 work
     aspect_ratios=[[2, 3], [2, 3], [2, 3], [2, 3], [2, 3], [2, 3]],
     image_shape="${train.imshape}",
     scale_center_variance=0.1,
@@ -58,4 +53,3 @@ model = L(RetinaNet)(
     num_classes=8+1,  # Add 1 for background
     anchor_prob_initialization=True
 )
-
