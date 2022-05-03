@@ -65,8 +65,8 @@ schedulers = dict(
 
 data_train = dict(
     dataset=L(TDT4265Dataset)(
-        img_folder=get_dataset_dir("tdt4265_2022_updated/"),
-        annotation_file="data/tdt4265_2022_updated/train_annotations.json",
+        img_folder=get_dataset_dir("tdt4265_2022/"),
+        annotation_file="data/tdt4265_2022/train_annotations.json",
         # transform=L(torchvision.transforms.Compose)(transforms=[
         #     L(ToTensor)(),  # ToTensor has to be applied before conversion to anchors.
         #     # GroundTruthBoxesToAnchors assigns each ground truth to anchors, required to compute loss in training.
@@ -83,8 +83,8 @@ data_train = dict(
 )
 data_val = dict(
     dataset=L(TDT4265Dataset)(
-        img_folder=get_dataset_dir("tdt4265_2022_updated"),
-        annotation_file="data/tdt4265_2022_updated/val_annotations.json",
+        img_folder=get_dataset_dir("tdt4265_2022"),
+        annotation_file="data/tdt4265_2022/val_annotations.json",
         # transform=L(torchvision.transforms.Compose)(transforms=[
         #     L(ToTensor)()
         # ])
