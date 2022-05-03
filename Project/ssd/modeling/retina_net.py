@@ -73,7 +73,7 @@ class RetinaNet(nn.Module):
                     nn.init.constant_(layer.bias.data, 0)
             
             p = 0.99
-            b = torch.log(torch.tensor(p* (self.K - 1)/(1 - p)))
+            b = torch.log(torch.tensor(p * (self.K - 1)/(1 - p)))
             nn.init.constant_(self.classification_heads[-1].bias.data[:self.A], b)
 
         else:
