@@ -5,10 +5,13 @@ import matplotlib.pyplot as plt
 def create_pretty_names(names):
     pretty_names = []
     for name in names:
-        pretty_name = name.replace('_', '.')
-        pretty_name = pretty_name.replace('v', '')
-        pretty_name = 'T' + pretty_name[1:]
-        pretty_name = pretty_name[:4] + ' ' + pretty_name[4:]
+        if name == 'tdt4265':
+            pretty_name = 'Task 2.1'
+        else:
+            pretty_name = name.replace('_', '.')
+            pretty_name = pretty_name.replace('v', '')
+            pretty_name = 'T' + pretty_name[1:]
+            pretty_name = pretty_name[:4] + ' ' + pretty_name[4:]
         pretty_names.append(pretty_name)
     return pretty_names
 
@@ -44,7 +47,7 @@ ax.set_ylim([0, 10])
 plt.xlabel('Number of steps')
 plt.ylabel('Loss')
 plt.grid()
-plt.savefig('scripts/loss_class_' + '-'.join(args))
+plt.savefig('scripts/loss_class_' + '-'.join(file_names) + '.svg')
 plt.clf()
 
 plt.title(f'Regression Loss')
@@ -54,7 +57,7 @@ plt.legend(create_pretty_names(file_names))
 plt.xlabel('Number of steps')
 plt.ylabel('Loss')
 plt.grid()
-plt.savefig('scripts/loss_reg_' + '-'.join(args))
+plt.savefig('scripts/loss_reg_' + '-'.join(file_names) + '.svg')
 plt.clf()
 
 plt.title(f'mAP@0.5:0.95')
@@ -64,5 +67,5 @@ plt.legend(create_pretty_names(file_names))
 plt.xlabel('Number of steps')
 plt.ylabel('mAP')
 plt.grid()
-plt.savefig('scripts/map_' + '-'.join(file_names))
+plt.savefig('scripts/map_' + '-'.join(file_names) + '.svg')
 plt.clf()
