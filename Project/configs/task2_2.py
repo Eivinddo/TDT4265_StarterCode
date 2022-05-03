@@ -5,7 +5,7 @@ from tops.config import LazyCall as L
 from ssd.data.transforms import (
     ToTensor, Normalize, Resize, RandomHorizontalFlip, RandomSampleCrop, GroundTruthBoxesToAnchors, 
     RandomBrightness, RandomContrast, GaussianBlur)
-from .ssd300 import (
+from .tdt4265 import (
     train, 
     anchors, 
     optimizer, 
@@ -46,14 +46,14 @@ val_gpu_transform = L(torchvision.transforms.Compose)(transforms=[
 ])
 
 data_train.dataset = L(TDT4265Dataset)(
-    img_folder=get_dataset_dir("tdt4265_2022"),
+    img_folder=get_dataset_dir("tdt4265_2022_updated"),
     transform="${train_cpu_transform}",
-    annotation_file=get_dataset_dir("tdt4265_2022/train_annotations.json"))
+    annotation_file=get_dataset_dir("tdt4265_2022_updated/train_annotations.json"))
 
 data_val.dataset = L(TDT4265Dataset)(
-    img_folder=get_dataset_dir("tdt4265_2022"),
+    img_folder=get_dataset_dir("tdt4265_2022_updated"),
     transform="${val_cpu_transform}",
-    annotation_file=get_dataset_dir("tdt4265_2022/val_annotations.json"))
+    annotation_file=get_dataset_dir("tdt4265_2022_updated/val_annotations.json"))
 
 data_val.gpu_transform = val_gpu_transform
 data_train.gpu_transform = train_gpu_transform

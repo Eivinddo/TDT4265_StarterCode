@@ -1,31 +1,18 @@
 from math import gamma
 from ssd.modeling import backbones, SSDFocalLoss, AnchorBoxes, RetinaNet
-from .tdt4265 import (
+from tops.config import LazyCall as L
+from .task2_3_v2 import (
     train,
     optimizer,
     schedulers,
-    # backbone,
-    # model,
-    # data_train,
-    # data_val,
-    # val_cpu_transform,
-    # train_cpu_transform,
-    # gpu_transform,
-    # label_map,
-    # anchors,
-    # loss_objective,
-)
-
-from .task2_2 import (
-    data_train, 
+    data_train,
     data_val,
-    label_map,
     val_cpu_transform,
-    train_cpu_transform
+    train_cpu_transform,
+    label_map
 )
 
-from tops.config import LazyCall as L
-from ssd.modeling.backbones import FPN
+
 
 anchors = L(AnchorBoxes)(
     feature_sizes=[[32, 256], [16, 128], [8, 64], [4, 32], [2, 16], [1, 8]],
@@ -39,7 +26,7 @@ anchors = L(AnchorBoxes)(
 )
 
 
-backbone = L(FPN)(pretrained=True,
+backbone = L(backbones.FPN)(pretrained=True,
                   fpn_out_channels = 256,
                   output_feature_sizes="${anchors.feature_sizes}")
 
