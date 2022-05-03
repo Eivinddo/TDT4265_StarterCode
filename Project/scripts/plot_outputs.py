@@ -1,5 +1,6 @@
 import sys
 import json
+import matplotlib
 import matplotlib.pyplot as plt
 
 def create_pretty_names(names):
@@ -14,6 +15,14 @@ def create_pretty_names(names):
             pretty_name = pretty_name[:4] + ' ' + pretty_name[4:]
         pretty_names.append(pretty_name)
     return pretty_names
+
+### Colors used for the different tasks ###
+# tdt4265 - red
+# task2_2 - blue
+# task2_3_v1 - black
+# task2_3_v2 - g
+# task2_3_v3 - orange
+# task2_3_v4 - darkmagenta
 
 args = sys.argv[1:]
 file_names = args[0::2]
@@ -38,6 +47,9 @@ for file_name in file_names:
             loss_class[file_name][data['global_step']] = data['loss/classification_loss']
             loss_reg[file_name][data['global_step']] = data['loss/regression_loss']
 
+font = {'size' : 16}
+matplotlib.rc('font', **font)
+
 plt.title(f'Classification Loss')
 for i in range(len(args)//2):
     plt.plot(loss_class[file_names[i]].keys(), loss_class[file_names[i]].values(), color=colors[i])
@@ -59,6 +71,9 @@ plt.ylabel('Loss')
 plt.grid()
 plt.savefig('scripts/loss_reg_' + '-'.join(file_names) + '.svg')
 plt.clf()
+
+font = {'size' : 10}
+matplotlib.rc('font', **font)
 
 plt.title(f'mAP@0.5:0.95')
 for i in range(len(args)//2):
