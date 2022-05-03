@@ -5,7 +5,16 @@ from tops.config import LazyCall as L
 from ssd.data.transforms import (
     ToTensor, Normalize, Resize, RandomHorizontalFlip, RandomSampleCrop, GroundTruthBoxesToAnchors, 
     RandomBrightness, RandomContrast, GaussianBlur)
-from .ssd300 import train, anchors, optimizer, schedulers, backbone, model, data_train, data_val, loss_objective
+from .ssd300 import (
+    train, 
+    anchors, 
+    optimizer, 
+    schedulers, 
+    backbone, 
+    model, 
+    data_train, 
+    data_val, 
+    loss_objective )
 from .utils import get_dataset_dir
 
 
@@ -31,7 +40,7 @@ val_cpu_transform = L(torchvision.transforms.Compose)(transforms=[
 train_gpu_transform = L(torchvision.transforms.Compose)(transforms=[
     L(RandomContrast)(),
     L(RandomBrightness)(),
-    L(GaussianBlur)(imshape="${train.imshape}"),
+    # L(GaussianBlur)(imshape="${train.imshape}"),
     L(Normalize)(mean=[0.4765, 0.4774, 0.2259], std=[0.2951, 0.2864, 0.2878])
 ])
 

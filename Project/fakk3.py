@@ -55,26 +55,27 @@ class_mod = nn.ModuleList(classification_heads)
 
 for layer in class_mod:
     if hasattr(layer, "weight"):
-        nn.init.normal_(layer.weight.data, 0, 0.01)
-        #print(layer.weight.data)
+        nn.init.kaiming_uniform_(layer.weight, nonlinearity='relu')
+        print(layer.weight.data)
     if hasattr(layer, "bias"):
         nn.init.constant_(layer.bias.data, 0)
         #print(layer.bias.data)
 
+
 for layer in reg_mod:
     if hasattr(layer, "weight"):
-        nn.init.normal_(layer.weight.data, 0, 0.01)
+        nn.init.kaiming_uniform_(layer.weight, nonlinearity='relu')
     if hasattr(layer, "bias"):
         nn.init.constant_(layer.bias.data, 0)
         #print(layer.bias.data)
 
 p = 0.99
 b = torch.log(torch.tensor(p*((K-1)/(1-p))))
-nn.init.constant_(reg_mod[-1].bias.data[:A],b)
+nn.init.constant_(class_mod[-1].bias.data[:A],b)
 
-for layer in reg_mod:
-    if hasattr(layer, "bias"):
-        print(layer.bias)
+# for layer in reg_mod:
+#     if hasattr(layer, "bias"):
+#         print(layer.bias)
 
 
 

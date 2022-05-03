@@ -61,20 +61,20 @@ class RetinaNet(nn.Module):
             # Init classification heads
             for layer in self.classification_heads:
                 if hasattr(layer, "weight"):
-                    nn.init.normal_(layer.weight.data, 0, 0.01)
+                    nn.init.kaiming_uniform_(layer.weight, nonlinearity='relu')
                 if hasattr(layer, "bias"):
                     nn.init.constant_(layer.bias.data, 0)
 
             # Init regression heads
             for layer in self.regression_heads:
                 if hasattr(layer, "weight"):
-                    nn.init.normal_(layer.weight.data, 0, 0.01)
+                    nn.init.kaiming_uniform_(layer.weight, nonlinearity='relu')
                 if hasattr(layer, "bias"):
                     nn.init.constant_(layer.bias.data, 0)
             
             p = 0.99
-            b = torch.log(torch.tensor(-p/(1 - p)))
-            nn.init.constant_(self.regression_heads[-1].bias.data[:self.A], b)
+            b = torch.log(torch.tensor(p* (self.K - 1)/(1 - p)))
+            nn.init.constant_(self.classification_heads[-1].bias.data[:self.A], b)
 
         else:
             layers = [self.regression_heads, self.classification_heads]

@@ -238,7 +238,10 @@ class GaussianBlur(torch.nn.Module):
         super().__init__()
         self.imshape = tuple(imshape)
 
-    @torch.no_grad()
-    def forward(self, batch):
-        batch["image"] = torchvision.transforms.functional.resize(batch["image"], self.imshape, antialias=True)
-        return batch
+#     @torch.no_grad()
+#     def forward(self, batch):from .ssd300 import train, anchors, optimizer, schedulers, backbone, model, data_train, data_val, loss_objective
+
+#         transform = torchvision.transforms.GaussianBlur(self.imshape, sigma=(0.1,.2)
+#         batch["image"] = transform(batch["image"])
+#         # functional.resize(batch["image"], self.imshape, antialias=True)
+#         return batch

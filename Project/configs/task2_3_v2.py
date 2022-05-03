@@ -8,30 +8,26 @@ from .tdt4265 import (
     model,
     # data_train,
     # data_val,
-    val_cpu_transform,
-    train_cpu_transform,
-    gpu_transform,
-    label_map,
+    # val_cpu_transform,
+    # train_cpu_transform,
+    # gpu_transform,
+    # label_map,
     # anchors,
     # loss_objective
 )
 
 from .task2_2 import (
     data_train, 
-    data_val
+    data_val,
+    label_map
 )
 
 from tops.config import LazyCall as L
 from ssd.modeling.backbones import FPN
 
-# Initialization of weights. Default: True.
+# Initialization of weights. Default: False.
 model.anchor_prob_initialization = False
 
-loss_objective = L(SSDFocalLoss)(anchors="${anchors}", gamma=2)
-
-backbone = L(FPN)(pretrained=True,
-                  fpn_out_channels = 256,
-                  output_feature_sizes="${anchors.feature_sizes}")
 
 anchors = L(AnchorBoxes)(
     feature_sizes=[[32, 256], [16, 128], [8, 64], [4, 32], [2, 16], [1, 8]],
@@ -48,3 +44,11 @@ anchors = L(AnchorBoxes)(
     scale_center_variance=0.1,
     scale_size_variance=0.2
 )
+
+loss_objective = L(SSDFocalLoss)(anchors="${anchors}", gamma=2)
+
+backbone = L(FPN)(pretrained=True,
+                  fpn_out_channels = 256,
+                  output_feature_sizes="${anchors.feature_sizes}")
+
+
