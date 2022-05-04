@@ -41,7 +41,7 @@
 # )
 
 from math import gamma
-from ssd.modeling import backbones, SSDFocalLoss, AnchorBoxes, RetinaNet
+from ssd.modeling import backbones, SSDFocalLoss, AnchorBoxes2, RetinaNet2
 from tops.config import LazyCall as L
 from ssd.modeling.backbones import FPN
 from .task2_3_v4 import (
@@ -56,7 +56,7 @@ from .task2_3_v4 import (
 )
 
 
-anchors = L(AnchorBoxes)(
+anchors = L(AnchorBoxes2)(
     feature_sizes=[[32, 256], [16, 128], [8, 64], [4, 32], [2, 16], [1, 8]],
     # Strides is the number of pixels (in image space) between each spatial position in the feature map
     strides=[[4, 4], [8, 8], [16, 16], [32, 32], [64, 64], [128, 128]],
@@ -74,7 +74,7 @@ backbone = L(FPN)(pretrained=True,
 
 loss_objective = L(SSDFocalLoss)(anchors="${anchors}", gamma=2)
 
-model = L(RetinaNet)(
+model = L(RetinaNet2)(
     feature_extractor="${backbone}",
     anchors="${anchors}",
     loss_objective="${loss_objective}",
