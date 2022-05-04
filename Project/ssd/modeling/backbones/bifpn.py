@@ -2,13 +2,24 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from torch.autograd import Variable
+class BiFPN(nn.Module):
+    def __init__(self,
+                 in_channels: int,
+                 out_channels: int):
+        super().__init__()
+
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        self.epsilon = 0.001
+
+    
+    def forward(self, x):
+        pass
+
 
 class DepthwiseConvBlock(nn.Module):
     """
-    Depthwise seperable convolution. 
-    
-    
+    Depthwise seperable convolution.    
     """
     def __init__(self, in_channels, out_channels, kernel_size=1, stride=1, padding=0, dilation=1, freeze_bn=False):
         super(DepthwiseConvBlock,self).__init__()
@@ -30,7 +41,6 @@ class DepthwiseConvBlock(nn.Module):
 class ConvBlock(nn.Module):
     """
     Convolution block with Batch Normalization and ReLU activation.
-    
     """
     def __init__(self, in_channels, out_channels, kernel_size=1, stride=1, padding=0, dilation=1, freeze_bn=False):
         super(ConvBlock,self).__init__()
