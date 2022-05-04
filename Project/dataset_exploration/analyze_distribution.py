@@ -46,10 +46,14 @@ def analyze_something(dataloader, cfg):
     
     plt.xticks(range(len(classes)), ['car', 'truck', 'bus', 'motorcycle', 'bicycle', 'scooter', 'person', 'rider'])
     plt.ylabel("Number of boxes")
+    ax = plt.gca()
     plt.ylim(0, bar_height_max*1.1)
+    for tick in ax.get_xticklabels():
+        tick.set_rotation(25)
     
     # plt.waitforbuttonpress()
     plt.savefig("dataset_exploration/distribution.png")
+    plt.savefig("dataset_exploration/distribution.svg")
 
 
 def main():

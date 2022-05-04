@@ -55,17 +55,20 @@ def analyze_boxes(dataloader, cfg):
     # plt.waitforbuttonpress()
     plt.xlim([0, 55000])
     plt.ylim([0, 12])
-    plt.savefig("dataset_exploration/box_size_and_ar.png")
+    plt.savefig("figures/box_size_and_ar.png")
+    plt.savefig("figures/svgs/box_size_and_ar.svg")
     ax = plt.gca()
-    with open('dataset_exploration/box_size_and_ar.pkl','wb') as file:
+    with open('figures/box_size_and_ar.pkl','wb') as file:
         pickle.dump(ax, file)
     
     plt.xlim([0, 10000])
     plt.ylim([0, 6])
-    plt.savefig("dataset_exploration/box_size_and_ar_zoom.png")
+    plt.savefig("figures/box_size_and_ar_zoom.png")
+    plt.savefig("figures/svgs/box_size_and_ar_zoom.svg")
     plt.xlim([0, 1000])
     plt.ylim([0, 6])
-    plt.savefig("dataset_exploration/box_size_and_ar_zoom_zoom.png")
+    plt.savefig("figures/box_size_and_ar_zoom_zoom.png")
+    plt.savefig("figures/svgs/box_size_and_ar_zoom_zoom.svg")
 
 
 def main():

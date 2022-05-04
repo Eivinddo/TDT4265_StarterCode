@@ -12,8 +12,6 @@ from .task2_3_v2 import (
     label_map
 )
 
-
-
 anchors = L(AnchorBoxes)(
     feature_sizes=[[32, 256], [16, 128], [8, 64], [4, 32], [2, 16], [1, 8]],
     # Strides is the number of pixels (in image space) between each spatial position in the feature map
@@ -24,7 +22,6 @@ anchors = L(AnchorBoxes)(
     scale_center_variance=0.1,
     scale_size_variance=0.2
 )
-
 
 backbone = L(backbones.FPN)(pretrained=True,
                   fpn_out_channels = 256,
@@ -39,4 +36,3 @@ model = L(RetinaNet)(
     num_classes=8+1,  # Add 1 for background
     anchor_prob_initialization=False
 )
-

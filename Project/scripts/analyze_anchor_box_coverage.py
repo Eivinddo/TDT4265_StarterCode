@@ -88,9 +88,8 @@ class AnchorBoxesTester(object):
     def scale_wh(self):
         return self.scale_size_variance
 
-with open('dataset_exploration/box_size_and_ar.pkl', 'rb') as file:
+with open('figures/box_size_and_ar.pkl', 'rb') as file:
     ax = pickle.load(file)
-#ax = pickle.load('dataset_exploration/box_size_and_ar_zoom_zoom.pickle')
 
 anchors = AnchorBoxesTester(
     feature_sizes=[[32, 256], [16, 128], [8, 64], [4, 32], [2, 16], [1, 8]],
@@ -110,17 +109,30 @@ anchors = AnchorBoxesTester(
     ax=ax
 )
 
-plt.show()
+# Original
+# anchors = AnchorBoxesTester(
+#     feature_sizes=[[32, 256], [16, 128], [8, 64], [4, 32], [2, 16], [1, 8]],
+#     # Strides is the number of pixels (in image space) between each spatial position in the feature map
+#     strides=[[4, 4], [8, 8], [16, 16], [32, 32], [64, 64], [128, 128]],
+#     min_sizes=[[16, 16], [32, 32], [48, 48], [64, 64], [86, 86], [128, 128], [128, 400]],
+#     aspect_ratios=[[2, 3], [2, 3], [2, 3], [2, 3], [2, 3], [2, 3]],
+#     image_shape=(128, 1024),
+#     scale_center_variance=0.1,
+#     scale_size_variance=0.2,
+#     ax=ax
+# )
 
 ax.set_ylim([0, 10])
 ax.set_xlim([0, 40000])
 ax.set_ylabel("Aspect ratio")
 ax.set_xlabel("Box size")
 
-plt.savefig('figures/anchor_box_coverage_improved.png')
-plt.savefig('figures/anchor_box_coverage_improved.svg')
+plt.savefig('figures/anchor_box_coverage_original.png')
+plt.savefig('figures/svgs/anchor_box_coverage_original.svg')
 ax.set_ylim([0, 6])
 ax.set_xlim([0, 5000])
-plt.savefig('figures/anchor_box_coverage_improved_zoom.png')
-plt.savefig('figures/anchor_box_coverage_improved_zoom.svg')
-
+plt.savefig('figures/anchor_box_coverage_original_zoom.png')
+plt.savefig('figures/svgs/anchor_box_coverage_original_zoom.svg')
+ax.set_ylim([0, 12])
+ax.set_xlim([0, 55000])
+plt.show()

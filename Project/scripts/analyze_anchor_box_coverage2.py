@@ -159,7 +159,7 @@ class AnchorBoxesTester2(object):
         self.anchors_ltrb[:, 2] = self.anchors_xywh[:, 0] + 0.5 * self.anchors_xywh[:, 2]
         self.anchors_ltrb[:, 3] = self.anchors_xywh[:, 1] + 0.5 * self.anchors_xywh[:, 3]
 
-with open('dataset_exploration/box_size_and_ar.pkl', 'rb') as file:
+with open('figures/box_size_and_ar.pkl', 'rb') as file:
     ax = pickle.load(file)
 #ax = pickle.load('dataset_exploration/box_size_and_ar_zoom_zoom.pickle')
 
