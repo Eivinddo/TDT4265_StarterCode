@@ -158,7 +158,7 @@ from .anchor_encoder import AnchorEncoder
 from torchvision.ops import batched_nms
 
 
-class RetinaNet(nn.Module):
+class RetinaNet2(nn.Module):
     def __init__(self, 
             feature_extractor: nn.Module,
             anchors,
@@ -277,7 +277,7 @@ class RetinaNet(nn.Module):
         confidences = []
         i = 0
         for x in features:
-            if i < 2:
+            if i < 4:
                 bbox_delta = self.regression_heads[0](x).view(x.shape[0], 4, -1)
                 bbox_conf = self.classification_heads[0](x).view(x.shape[0], self.num_classes, -1)
             else:
@@ -289,9 +289,9 @@ class RetinaNet(nn.Module):
 
             i += 1
 
+
         bbox_delta = torch.cat(locations, 2).contiguous()
         confidences = torch.cat(confidences, 2).contiguous()
-
         return bbox_delta, confidences
     
     def forward(self, img: torch.Tensor, **kwargs):
