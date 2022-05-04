@@ -4,6 +4,7 @@ from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
 from tops.torch_utils import set_seed
+from math import ceil
 
 
 def get_config(config_path):
@@ -31,12 +32,14 @@ def analyze_boxes(dataloader, cfg):
     
     box_size_per_class = np.empty(len(classes))
     num_boxes_per_class = np.zeros((N, len(label_map)-1))
+    box_sizes = []
 
     #dict_keys(['image', 'boxes', 'labels', 'width', 'height', 'image_id'])
     for i, batch in enumerate(tqdm(dataloader)):
         for k, box in enumerate(batch['boxes'][0]):
             box_size = (box[2] - box[0])*batch['width'] * (box[3] - box[1])*batch['height']
             box_size_per_class[batch['labels'][0][k]-1] += box_size
+            box_sizes.append(int(box_size))
 
         for j in range(1, 8+1):
             num_boxes_per_class[i, j-1] = np.sum(np.array(batch['labels'])==j)
@@ -60,6 +63,21 @@ def analyze_boxes(dataloader, cfg):
     
     # plt.waitforbuttonpress()
     plt.savefig("dataset_exploration/boxes.png")
+    
+    bins = np.array(range(0, 55000))
+    x = np.bincount(np.digitize(box_sizes, bins))[1:]
+
+    # print(bins)
+    # print(x)
+
+    plt.figure()
+    plt.bar(bins, x, width=0.1)
+    plt.xticks(range(int(bins[0]), ceil(bins[-1])+1))
+    plt.xlabel("Box sizes")
+    plt.ylabel("Count")
+    
+    # plt.waitforbuttonpress()
+    plt.savefig("dataset_exploration/box_size_distribution.png")
 
 
 def main():
