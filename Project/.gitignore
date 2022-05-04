@@ -23,3 +23,6 @@ outputs/
 data/VOCdevkit
 notebooks/data
 data/tdt4265_2022
+
+#div
+dataset_exploration/*.pkl
