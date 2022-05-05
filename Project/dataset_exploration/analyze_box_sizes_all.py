@@ -46,7 +46,7 @@ def analyze_boxes(dataloader, cfg):
     box_data = np.array(box_data)
 
     for lab_num in label_color_map.keys():
-        plt.scatter(box_data[box_data[:,2]==lab_num, 0], box_data[box_data[:,2]==lab_num, 1], marker='x', s=2, color=label_color_map[lab_num], label=label_map[lab_num])
+        plt.scatter(box_data[box_data[:,2]==lab_num, 0], box_data[box_data[:,2]==lab_num, 1], marker='x', s=1, color=label_color_map[lab_num], label=label_map[lab_num])
     
     plt.legend()
     plt.ylabel("Aspect ratio")
