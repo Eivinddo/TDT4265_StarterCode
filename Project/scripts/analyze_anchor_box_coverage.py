@@ -93,16 +93,13 @@ with open('figures/box_size_and_ar.pkl', 'rb') as file:
 
 anchors = AnchorBoxesTester(
     feature_sizes=[[32, 256], [16, 128], [8, 64], [4, 32], [2, 16], [1, 8]],
-    # Strides is the number of pixels (in image space) between each spatial position in the feature map
     strides=[[4, 4], [8, 8], [16, 16], [32, 32], [64, 64], [128, 128]],
     #min_sizes=[[16, 16], [32, 32], [48, 48], [64, 64], [86, 86], [128, 128], [128, 400]],
-    min_sizes=[[14, 10], [26, 24], [40, 40], [60, 60], [84, 88], [120, 136], [134, 420]],
-    # aspect ratio is defined per feature map (first index is largest feature map (38x38))
-    # aspect ratio is used to define two boxes per element in the list.
-    # if ratio=[2], boxes will be created with ratio 1:2 and 2:1
-    # Number of boxes per location is in total 2 + 2 per aspect ratio
+    min_sizes=[[16, 16], [30, 30], [48, 48], [64, 64], [86, 86], [128, 128], [128, 400]],
+    #min_sizes=[[14, 14], [30, 26], [48, 48], [64, 64], [86, 86], [126, 128], [128, 400]],
     #aspect_ratios=[[2, 3], [2, 3], [2, 3], [2, 3], [2, 3], [2, 3]],
-    aspect_ratios=[[3, 4], [2, 4], [2, 3], [2, 3], [2, 3], [2, 3]],
+    #aspect_ratios=[[3, 4], [3, 4], [2, 3], [2, 3], [2, 3], [2, 3]],
+    aspect_ratios=[[1.4, 4], [1.4, 4], [1.5, 4], [1.5, 4], [1.5, 3], [1.5, 2]],
     image_shape=(128, 1024),
     scale_center_variance=0.1,
     scale_size_variance=0.2,
@@ -127,12 +124,12 @@ ax.set_xlim([0, 40000])
 ax.set_ylabel("Aspect ratio")
 ax.set_xlabel("Box size")
 
-plt.savefig('figures/anchor_box_coverage_original.png')
-plt.savefig('figures/svgs/anchor_box_coverage_original.svg')
+plt.savefig('figures/anchor_box_coverage_test.png')
+plt.savefig('figures/svgs/anchor_box_coverage_test.svg')
 ax.set_ylim([0, 6])
 ax.set_xlim([0, 5000])
-plt.savefig('figures/anchor_box_coverage_original_zoom.png')
-plt.savefig('figures/svgs/anchor_box_coverage_original_zoom.svg')
+plt.savefig('figures/anchor_box_coverage_improved_test.png')
+plt.savefig('figures/svgs/anchor_box_coverage_improved_test.svg')
 ax.set_ylim([0, 12])
 ax.set_xlim([0, 55000])
 plt.show()
