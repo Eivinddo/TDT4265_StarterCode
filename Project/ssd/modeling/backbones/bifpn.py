@@ -56,9 +56,7 @@ class ConvBlock(nn.Module):
 
 class BiFPNBlock(nn.Module):
     """
-    Making a complete block of the BiFPN as shown in:
-    Mingxing Tan, Ruoming Pang, and Quoc V Le. Efficientdet: Scalable and efficient object detection. 
-    In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition, pages 10781–10790, 2020. 7
+    Implementation of the BiFPN layers.
     """
     def __init__(self, feature_size=128, epsilon=0.0001):
         super(BiFPNBlock, self).__init__()
@@ -76,14 +74,12 @@ class BiFPNBlock(nn.Module):
         self.p7_out = DepthwiseSeparableConvBlock(feature_size)
         self.p8_out = DepthwiseSeparableConvBlock(feature_size)
         
-        # TODO: Init weights
-        # self.w1_td = nn.Parameter(torch.Tensor(2, 5))
-        # nn.init.kaiming_uniform_(self.w1_td, nonlinearity='relu')
-        self.w1_td = torch.as_tensor(torch.ones(2, 5))
+        self.w1_td = torch.Tensor(2, 5)
+        nn.init.kaiming_uniform_(self.w1_td, nonlinearity='relu')
         self.w1_relu = nn.ReLU()
-        # self.w2_up = nn.Parameter(torch.Tensor(3, 5))
-        # nn.init.kaiming_uniform_(self.w2_up, nonlinearity='relu')
-        self.w2_up = torch.as_tensor(torch.ones(3, 5))
+
+        self.w2_up = torch.Tensor(3, 5)
+        nn.init.kaiming_uniform_(self.w2_up, nonlinearity='relu')
         self.w2_relu = nn.ReLU()
     
     def forward(self, inputs):
@@ -124,8 +120,6 @@ class BiFPN(nn.Module):
         self.out_channels = [self.fpn_out_channels]*6
         self.output_feature_shape = output_feature_sizes
         
-        self.resnet_out_channels = [64, 128, self.fpn_out_channels, self.fpn_out_channels, self.fpn_out_channels, self.fpn_out_channels, self.fpn_out_channels, self.fpn_out_channels]
-
         self.feature_extractor = nn.Sequential(*list(torchvision.models.resnet34(pretrained=pretrained).children())[:-4])
 
         # print("---------------------------------------------")
