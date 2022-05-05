@@ -44,36 +44,48 @@ class RetinaNet2(nn.Module):
         
         self.regression_heads1 = nn.Sequential(
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
+            
             nn.ReLU(inplace=True),
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
+            
             nn.ReLU(inplace=True),
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
+            
             nn.ReLU(inplace=True),
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
+            
             nn.ReLU(inplace=True),
             nn.Conv2d(self.C, 4*self.A1, kernel_size=3, padding=1)
         )
 
         self.classification_heads2 = nn.Sequential(
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
+            
             nn.ReLU(inplace=True),
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
+            
             nn.ReLU(inplace=True),
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
+            
             nn.ReLU(inplace=True),
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
+            
             nn.ReLU(inplace=True),
             nn.Conv2d(self.C, self.K*self.A2, kernel_size=3, padding=1)
         )
         
         self.regression_heads2 = nn.Sequential(
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
+            
             nn.ReLU(inplace=True),
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
+            
             nn.ReLU(inplace=True),
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
+            
             nn.ReLU(inplace=True),
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
+            
             nn.ReLU(inplace=True),
             nn.Conv2d(self.C, 4*self.A2, kernel_size=3, padding=1)
         )
@@ -123,7 +135,7 @@ class RetinaNet2(nn.Module):
         confidences = []
         i = 0
         for x in features:
-            if i < 4:
+            if i < 2:
                 bbox_delta = self.regression_heads[0](x).view(x.shape[0], 4, -1)
                 bbox_conf = self.classification_heads[0](x).view(x.shape[0], self.num_classes, -1)
             else:

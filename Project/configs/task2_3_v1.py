@@ -15,7 +15,6 @@ from .task2_2 import (
     loss_objective
 )
 
-
 backbone = L(backbones.FPN)(pretrained=True,
                   fpn_out_channels = 256,
                   output_feature_sizes="${anchors.feature_sizes}")

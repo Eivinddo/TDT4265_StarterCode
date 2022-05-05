@@ -1,5 +1,5 @@
 from math import gamma
-from ssd.modeling import RetinaNet
+from ssd.modeling import backbones
 from tops.config import LazyCall as L
 from .task2_3_v3 import (
     train,
@@ -11,14 +11,11 @@ from .task2_3_v3 import (
     train_cpu_transform,
     label_map,
     anchors,
-    backbone,
+    model,
+    # backbone,
     loss_objective
 )
 
-model = L(RetinaNet)(
-    feature_extractor="${backbone}",
-    anchors="${anchors}",
-    loss_objective="${loss_objective}",
-    num_classes=8+1,  # Add 1 for background
-    anchor_prob_initialization=True
-)
+backbone = L(backbones.BiFPN)(pretrained=True,
+                              output_feature_sizes="${anchors.feature_sizes}",
+                              fpn_out_channels = 128)

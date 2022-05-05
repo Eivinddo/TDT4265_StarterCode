@@ -8,12 +8,12 @@ class FPN(nn.Module):
     """
     This is a basic backbone for RetinaNet - Feature Pyramid network based on ResNet.
     The feature extractor outputs a list of 6 feature maps, with the sizes:
-    [shape(-1, output_channels[0], 38, 38),
-     shape(-1, output_channels[1], 19, 19),
-     shape(-1, output_channels[2], 10, 10),
-     shape(-1, output_channels[3], 5, 5),
-     shape(-1, output_channels[3], 3, 3),
-     shape(-1, output_channels[4], 1, 1)]
+    [shape(-1, output_channels[0], 64, 64),
+     shape(-1, output_channels[1], 128, 128),
+     shape(-1, output_channels[2], 256, 256),
+     shape(-1, output_channels[3], 512, 512),
+     shape(-1, output_channels[3], 1024, 1024),
+     shape(-1, output_channels[4], 2048, 2048)]
     """
     def __init__(self,
                  pretrained: bool,
@@ -31,14 +31,18 @@ class FPN(nn.Module):
 
         self.feature_extractor.add_module("layer5", nn.Sequential(
             nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(512),
             nn.ReLU(),
             nn.Conv2d(512, 1024, kernel_size=3, stride=2, padding=1),    # Downsample
+            nn.BatchNorm2d(1024),
             nn.ReLU()
         ))
         self.feature_extractor.add_module("layer6", nn.Sequential(
             nn.Conv2d(1024, 1024, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(1024),
             nn.ReLU(),
             nn.Conv2d(1024, 2048, kernel_size=3, stride=2, padding=1),    # Downsample
+            nn.BatchNorm2d(2048),
             nn.ReLU()
         ))
         
