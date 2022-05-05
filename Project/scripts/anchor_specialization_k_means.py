@@ -148,11 +148,9 @@ def analyze_ratios(annotation_path, num_aspect_ratios=6):
         aspect_ratios_per_size.append(sorted(aspect_ratios))
         avg_iou_perc_per_size.append(avg_iou_perc)
 
-    #aspect_ratios = sorted(aspect_ratios)
-
-    print('Sizes:', bins)
-    print('Aspect ratios generated:', [[round(ar,2) for ar in aspect_ratios_per_size[i]] for i in range(len(aspect_ratios))])
-    print('Average IOU with anchors:', avg_iou_perc_per_size)
+    #print('Sizes:', bins)
+    #print('Aspect ratios generated:', [[round(ar,2) for ar in aspect_ratios_per_size[i]] for i in range(len(aspect_ratios))])
+    #print('Average IOU with anchors:', avg_iou_perc_per_size)
     
     return sizes, aspect_ratios_per_size
 
