@@ -15,7 +15,6 @@ from .task2_3_v3 import (
     loss_objective
 )
 
-
 model = L(RetinaNet)(
     feature_extractor="${backbone}",
     anchors="${anchors}",
