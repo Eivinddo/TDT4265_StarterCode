@@ -3,11 +3,7 @@ import torch
 from typing import List
 from math import sqrt
 
-# Note on center/size variance:
-# This is used for endcoding/decoding the regressed coordinates from the SSD bounding box head to actual locations.
-# It's a trick to improve gradients from bounding box regression. Take a look at this post about more info:
-# https://leimao.github.io/blog/Bounding-Box-Encoding-Decoding/
-class AnchorBoxes(object):
+class AnchorBoxes2(object):
     def __init__(self, 
             image_shape: tuple, 
             feature_sizes: List[tuple], 
@@ -27,7 +23,9 @@ class AnchorBoxes(object):
         """
         self.scale_center_variance = scale_center_variance
         self.scale_size_variance = scale_size_variance
-        self.num_boxes_per_fmap = [2 + 2*len(ratio) for ratio in aspect_ratios]
+        # self.num_boxes_per_fmap = [2 + 2*len(ratio) for ratio in aspect_ratios]
+        self.num_boxes_per_fmap = [6,6,6,6,4,4]
+
 
         # Calculation method slightly different from paper
 
@@ -46,8 +44,16 @@ class AnchorBoxes(object):
             for r in aspect_ratios[fidx]:
                 h = h_min*sqrt(r)
                 w = w_min/sqrt(r)
-                bbox_sizes.append((w_min/sqrt(r), h_min*sqrt(r)))
-                bbox_sizes.append((w_min*sqrt(r), h_min/sqrt(r)))
+                if fidx < 2: 
+                    bbox_sizes.append((w_min/sqrt(r), h_min*sqrt(r)))
+                    # bbox_sizes.append((w_min*sqrt(r), h_min/sqrt(r)))
+                elif fidx>=2 and fidx < 4:
+                    bbox_sizes.append((w_min/sqrt(r), h_min*sqrt(r)))
+                    bbox_sizes.append((w_min*sqrt(r), h_min/sqrt(r)))
+                elif fidx >= 4:
+                    # bbox_sizes.append((w_min/sqrt(r), h_min*sqrt(r)))
+                    bbox_sizes.append((w_min*sqrt(r), h_min/sqrt(r)))
+                    # bbox_sizes.append((w_min*sqrt(r), h_min/sqrt(r))) # Ønsker å fjerne denne i de første lagene
             scale_y = image_shape[0] / strides[fidx][0]
             scale_x = image_shape[1] / strides[fidx][1]
             for w, h in bbox_sizes:
