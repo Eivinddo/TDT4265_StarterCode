@@ -2,16 +2,14 @@
 import torch
 from typing import List
 from math import sqrt
+from pathlib import Path
+import os
 from scripts.anchor_specialization_k_means import analyze_ratios
 
 
 class AnchorBoxesCustom(object):
     def __init__(self, 
             image_shape: tuple, 
-            feature_sizes: List[tuple], 
-            min_sizes: List[int],
-            strides: List[tuple],
-            aspect_ratios: List[int],
             scale_center_variance: float,
             scale_size_variance: float):
         """Generate SSD anchors Boxes.
@@ -25,18 +23,18 @@ class AnchorBoxesCustom(object):
         """
         self.scale_center_variance = scale_center_variance
         self.scale_size_variance = scale_size_variance
-        self.num_boxes_per_fmap = [6 for ratio in aspect_ratios]
 
-        annotation_path = "data/tdt4265_2022/train_annotations.json"
-
+        #annotation_path = "data/tdt4265_2022/train_annotations.json"
+        annotation_path = os.path.join(os.getcwd(), Path('data/tdt4265_2022/train_annotations.json'))
+        
         sizes, aspect_ratios_per_size = analyze_ratios(annotation_path, 6)
+        self.num_boxes_per_fmap = [len(ratios) for ratios in aspect_ratios_per_size]
+        self.aspect_ratios = aspect_ratios_per_size
+        self.feature_sizes = []
 
         anchors = []
-        # size of feature and number of feature
         for sidx, size in enumerate(sizes):
             bbox_sizes = []
-            #aspect_ratios = aspect_ratios_per_size[sidx]
-            
             for r in aspect_ratios_per_size[sidx]:
                 h = sqrt(size / r)
                 w = r * h
@@ -47,8 +45,12 @@ class AnchorBoxesCustom(object):
             square = sqrt(size)
             fH = round(image_shape[0] / square)
             fW = round(image_shape[1] / square)
-            scale_y = fH / 2
-            scale_x = fW / 2
+            self.feature_sizes.append([fH, fW])
+            
+            stride_y = image_shape[0] / fH
+            stride_x = image_shape[1] / fW
+            scale_y = image_shape[0] / stride_y
+            scale_x = image_shape[1] / stride_x
             for w, h in bbox_sizes:
                 for i in range(fH):
                     for j in range(fW):
