@@ -57,7 +57,6 @@ class RetinaNet(nn.Module):
 
     def _init_weights(self):
         if self.anchor_prob_initialization:
-
             # Init classification heads
             for layer in self.classification_heads:
                 if hasattr(layer, "weight"):

@@ -1,7 +1,7 @@
 from math import gamma
-from ssd.modeling import backbones
+from ssd.modeling import backbones, RetinaNet
 from tops.config import LazyCall as L
-from .task2_3_v3 import (
+from .task2_3_v4 import (
     train,
     optimizer,
     schedulers,
