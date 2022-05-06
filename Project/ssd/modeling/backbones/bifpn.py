@@ -86,12 +86,12 @@ class BiFPNLayer(nn.Module):
     def forward(self, inputs):
         p3_x, p4_x, p5_x, p6_x, p7_x, p8_x = inputs
         
-        # Calculate Top-Down Pathway
         w1_td = self.w1_relu(self.w1_td)
         w1_td /= torch.sum(w1_td, dim=0) + self.epsilon
         w2_up = self.w2_relu(self.w2_up)
         w2_up /= torch.sum(w2_up, dim=0) + self.epsilon
         
+        # Calculate Top-Down Pathway
         p8_td = p8_x
         p7_td = self.p7_td(w1_td[0, 0] * p7_x + w1_td[1, 0] * F.interpolate(p8_td, scale_factor=2))
         p6_td = self.p6_td(w1_td[0, 1] * p6_x + w1_td[1, 1] * F.interpolate(p7_td, scale_factor=2))
