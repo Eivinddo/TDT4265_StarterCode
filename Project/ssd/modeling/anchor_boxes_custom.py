@@ -9,7 +9,8 @@ from scripts.anchor_specialization_k_means import analyze_ratios
 
 class AnchorBoxesCustom(object):
     def __init__(self, 
-            image_shape: tuple, 
+            image_shape: tuple,
+            aspect_ratios_per_size: int,
             scale_center_variance: float,
             scale_size_variance: float):
         """Generate SSD anchors Boxes.
@@ -26,9 +27,10 @@ class AnchorBoxesCustom(object):
 
         #annotation_path = "data/tdt4265_2022/train_annotations.json"
         annotation_path = os.path.join(os.getcwd(), Path('data/tdt4265_2022/train_annotations.json'))
+        annotation_path = os.path.join(os.getcwd(), Path('data/tdt4265_2022_updated/train_annotations.json'))
         
         sizes, aspect_ratios_per_size = analyze_ratios(annotation_path, 6)
-        self.num_boxes_per_fmap = [len(ratios) for ratios in aspect_ratios_per_size]
+        self.num_boxes_per_fmap = [2*len(ratios) for ratios in aspect_ratios_per_size]
         self.aspect_ratios = aspect_ratios_per_size
         self.feature_sizes = []
 
@@ -36,11 +38,12 @@ class AnchorBoxesCustom(object):
         for sidx, size in enumerate(sizes):
             bbox_sizes = []
             for r in aspect_ratios_per_size[sidx]:
-                h = sqrt(size / r)
-                w = r * h
+                w = sqrt(size / r)
+                h = r * w
                 h = h / image_shape[0]
                 w = w / image_shape[1]
                 bbox_sizes.append((w, h))
+                bbox_sizes.append((w*sqrt(2), h*sqrt(2)))
             
             square = sqrt(size)
             fH = round(image_shape[0] / square)
