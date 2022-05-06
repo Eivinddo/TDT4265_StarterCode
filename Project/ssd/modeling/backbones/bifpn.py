@@ -2,14 +2,14 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchvision
-from typing import OrderedDict, Tuple, List
+from typing import List
 
 """
 This code is inspired by:
 https://github.dev/tristandb/EfficientDet-PyTorch/blob/master/bifpn.py
 """
 
-class DepthwiseSeparableConvBlock(nn.Module):
+class DepthwiseSeparableConvLayer(nn.Module):
     """
     Depthwise separable convolution block, with batch normalization and ReLU activation.
     The depthwise separable convolution is divided into a depthwise and a pointwise convolution.
@@ -17,7 +17,7 @@ class DepthwiseSeparableConvBlock(nn.Module):
     The pointwise convolution keeps the wxh of the input, and changes depth. -> kernel=1x1, stride=1, padding=0
     """
     def __init__(self, in_channels, out_channels=None, kernel_size=1, stride=1, padding=0):
-        super(DepthwiseSeparableConvBlock,self).__init__()
+        super(DepthwiseSeparableConvLayer,self).__init__()
 
         if out_channels == None:
             out_channels = in_channels
@@ -34,12 +34,13 @@ class DepthwiseSeparableConvBlock(nn.Module):
         return self.activation(x)
 
 
-class ConvBlock(nn.Module):
+class ConvLayer(nn.Module):
     """
-    Convolution block, with batch normalization and ReLU activation
+    Convolution block, with batch normalization and ReLU activation.
+    Used to construct p3-p8.
     """
     def __init__(self, in_channels, out_channels=None, kernel_size=1, stride=1, padding=0):
-        super(ConvBlock,self).__init__()
+        super(ConvLayer,self).__init__()
 
         if out_channels == None:
             out_channels = in_channels
@@ -54,25 +55,25 @@ class ConvBlock(nn.Module):
         return self.activation(x)
 
 
-class BiFPNBlock(nn.Module):
+class BiFPNLayer(nn.Module):
     """
     Implementation of the BiFPN layers.
     """
     def __init__(self, feature_size=128, epsilon=0.0001):
-        super(BiFPNBlock, self).__init__()
+        super(BiFPNLayer, self).__init__()
         self.epsilon = epsilon
         
-        self.p3_td = DepthwiseSeparableConvBlock(feature_size)
-        self.p4_td = DepthwiseSeparableConvBlock(feature_size)
-        self.p5_td = DepthwiseSeparableConvBlock(feature_size)
-        self.p6_td = DepthwiseSeparableConvBlock(feature_size)
-        self.p7_td = DepthwiseSeparableConvBlock(feature_size)
+        self.p3_td = DepthwiseSeparableConvLayer(feature_size)
+        self.p4_td = DepthwiseSeparableConvLayer(feature_size)
+        self.p5_td = DepthwiseSeparableConvLayer(feature_size)
+        self.p6_td = DepthwiseSeparableConvLayer(feature_size)
+        self.p7_td = DepthwiseSeparableConvLayer(feature_size)
         
-        self.p4_out = DepthwiseSeparableConvBlock(feature_size)
-        self.p5_out = DepthwiseSeparableConvBlock(feature_size)
-        self.p6_out = DepthwiseSeparableConvBlock(feature_size)
-        self.p7_out = DepthwiseSeparableConvBlock(feature_size)
-        self.p8_out = DepthwiseSeparableConvBlock(feature_size)
+        self.p4_out = DepthwiseSeparableConvLayer(feature_size)
+        self.p5_out = DepthwiseSeparableConvLayer(feature_size)
+        self.p6_out = DepthwiseSeparableConvLayer(feature_size)
+        self.p7_out = DepthwiseSeparableConvLayer(feature_size)
+        self.p8_out = DepthwiseSeparableConvLayer(feature_size)
         
         self.w1_td = torch.Tensor(2, 5)
         nn.init.kaiming_uniform_(self.w1_td, nonlinearity='relu')
@@ -112,8 +113,7 @@ class BiFPN(nn.Module):
     def __init__(self, pretrained: bool, 
                 output_feature_sizes: List[List[int]], 
                 fpn_out_channels: int = 128, 
-                num_layers=3, 
-                epsilon=0.0001):
+                num_layers=3):
         super(BiFPN, self).__init__()
         
         self.fpn_out_channels = fpn_out_channels
@@ -121,62 +121,43 @@ class BiFPN(nn.Module):
         self.output_feature_shape = output_feature_sizes
         
         self.feature_extractor = nn.Sequential(*list(torchvision.models.resnet34(pretrained=pretrained).children())[:-4])
-
-        # print("---------------------------------------------")
-        # print("ResNet34")
-        # print(nn.Sequential(*list(torchvision.models.resnet34(pretrained=pretrained).children())))
-        # print("---------------------------------------------")
-
-        # print("---------------------------------------------")
-        # print("Feature extractor without last 4 from resnet")
-        # print(self.feature_extractor)
-        # print("---------------------------------------------")
-        
+   
         self.feature_extractor.add_module("p3", nn.Sequential(
-            ConvBlock(64, self.fpn_out_channels, kernel_size=1, stride=1, padding=0),
-            ConvBlock(self.fpn_out_channels, self.fpn_out_channels, kernel_size=1, stride=1, padding=0),
+            ConvLayer(64, self.fpn_out_channels, kernel_size=1, stride=1, padding=0),
+            ConvLayer(self.fpn_out_channels, self.fpn_out_channels, kernel_size=1, stride=1, padding=0),
         ))
 
         self.feature_extractor.add_module("p4", nn.Sequential(
-            ConvBlock(self.fpn_out_channels, self.fpn_out_channels, kernel_size=3, stride=1, padding=1),
-            ConvBlock(self.fpn_out_channels, self.fpn_out_channels, kernel_size=3, stride=2, padding=1),
+            ConvLayer(self.fpn_out_channels, self.fpn_out_channels, kernel_size=3, stride=1, padding=1),
+            ConvLayer(self.fpn_out_channels, self.fpn_out_channels, kernel_size=3, stride=2, padding=1),
         ))
 
         self.feature_extractor.add_module("p5", nn.Sequential(
-            ConvBlock(self.fpn_out_channels, self.fpn_out_channels, kernel_size=3, stride=1, padding=1),
-            ConvBlock(self.fpn_out_channels, self.fpn_out_channels, kernel_size=3, stride=2, padding=1),
+            ConvLayer(self.fpn_out_channels, self.fpn_out_channels, kernel_size=3, stride=1, padding=1),
+            ConvLayer(self.fpn_out_channels, self.fpn_out_channels, kernel_size=3, stride=2, padding=1),
         ))
 
         self.feature_extractor.add_module("p6", nn.Sequential(
-            ConvBlock(self.fpn_out_channels, self.fpn_out_channels, kernel_size=3, stride=1, padding=1),
-            ConvBlock(self.fpn_out_channels, self.fpn_out_channels, kernel_size=3, stride=2, padding=1),
+            ConvLayer(self.fpn_out_channels, self.fpn_out_channels, kernel_size=3, stride=1, padding=1),
+            ConvLayer(self.fpn_out_channels, self.fpn_out_channels, kernel_size=3, stride=2, padding=1),
         ))
 
         self.feature_extractor.add_module("p7", nn.Sequential(
-            ConvBlock(self.fpn_out_channels, self.fpn_out_channels, kernel_size=3, stride=1, padding=1),
-            ConvBlock(self.fpn_out_channels, self.fpn_out_channels, kernel_size=3, stride=2, padding=1),
+            ConvLayer(self.fpn_out_channels, self.fpn_out_channels, kernel_size=3, stride=1, padding=1),
+            ConvLayer(self.fpn_out_channels, self.fpn_out_channels, kernel_size=3, stride=2, padding=1),
         ))
 
         self.feature_extractor.add_module("p8", nn.Sequential(
-            ConvBlock(self.fpn_out_channels, self.fpn_out_channels, kernel_size=3, stride=1, padding=1),
-            ConvBlock(self.fpn_out_channels, self.fpn_out_channels, kernel_size=3, stride=2, padding=1),
+            ConvLayer(self.fpn_out_channels, self.fpn_out_channels, kernel_size=3, stride=1, padding=1),
+            ConvLayer(self.fpn_out_channels, self.fpn_out_channels, kernel_size=3, stride=2, padding=1),
         ))
-
-        # print("---------------------------------------------")
-        # print("Feature extractor")
-        # print(self.feature_extractor)
-        # print("---------------------------------------------")
 
         bifpns = []
         for _ in range(num_layers):
-            bifpns.append(BiFPNBlock(self.fpn_out_channels))
+            bifpns.append(BiFPNLayer(self.fpn_out_channels))
         self.bifpn = nn.Sequential(*bifpns)
-        # print("---------------------------------------------")
-        # print(self.bifpn)
-        # print("---------------------------------------------")
 
     def forward(self, x):
-        # print(self.feature_extractor)
         # Ignore five first "layers"/operations, befor we start "storing" at p3
         for i in range(5):
             x = self.feature_extractor[i](x)
@@ -190,14 +171,8 @@ class BiFPN(nn.Module):
         p8_x = self.feature_extractor[11](p7_x)        
         
         features = [p3_x, p4_x, p5_x, p6_x, p7_x, p8_x]
-        # print("-------------------------------------")
-        # for i, el in enumerate(features):
-        #     print(f"- p{i+3}_x", str(el.shape).ljust(29), '-')
-        # print("-------------------------------------")
 
-        # out_features = self.fpn(pn_x).values()
         out_features = self.bifpn(features)
-        # print("out features", len(out_features))
         for idx, feature in enumerate(out_features):
             h, w = self.output_feature_shape[idx]
             expected_shape = (self.fpn_out_channels, h, w)
