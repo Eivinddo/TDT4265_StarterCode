@@ -92,7 +92,7 @@ def kmeans_aspect_ratios(bboxes, kmeans_max_iter, num_aspect_ratios):
     if not np.isfinite(avg_iou_perc):
         sys.exit("Failed to get aspect ratios due to numerical errors in k-means")
 
-    aspect_ratios = [w/h for w,h in ar]
+    aspect_ratios = [h/w for w,h in ar]
 
     return aspect_ratios, avg_iou_perc
 

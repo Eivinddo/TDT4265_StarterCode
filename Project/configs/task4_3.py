@@ -1,4 +1,3 @@
-from math import gamma
 from ssd.modeling import backbones, SSDFocalLoss, AnchorBoxesCustom, RetinaNet
 from tops.config import LazyCall as L
 from ssd.modeling.backbones import FPN2
@@ -21,6 +20,7 @@ anchors = L(AnchorBoxesCustom)(
     #min_sizes=[[16, 16], [32, 32], [48, 48], [64, 64], [86, 86], [128, 128], [128, 400]],
     #aspect_ratios=[[2, 3, 4], [2, 3, 4], [2, 3, 4], [2, 3, 4], [2, 3, 4], [2, 3, 4]],
     image_shape="${train.imshape}",
+    aspect_ratios_per_size = 8,
     scale_center_variance=0.1,
     scale_size_variance=0.2
 )
