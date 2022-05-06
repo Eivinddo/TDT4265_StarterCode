@@ -23,6 +23,7 @@ def create_pretty_names(names):
 # task2_3_v2 - g
 # task2_3_v3 - orange
 # task2_3_v4 - darkmagenta
+# task4_1 - grey
 
 args = sys.argv[1:]
 file_names = args[0::2]
