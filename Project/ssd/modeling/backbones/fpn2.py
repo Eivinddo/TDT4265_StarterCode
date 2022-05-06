@@ -71,11 +71,9 @@ class FPN2(nn.Module):
         pyramid = OrderedDict()
         
         # Pass x through the resnet
-        print("XXXX1.shape", x.shape)
         x = self.feature_extractor[4](x)
         x = F.interpolate(x, size=self.output_feature_shape[0])
         pyramid['feat0'] = x
-        print("feat0.shape", pyramid['feat0'].shape)
         
         x = self.feature_extractor[5](x)
         x = F.interpolate(x, size=self.output_feature_shape[1])
