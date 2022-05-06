@@ -3,6 +3,7 @@ import torch
 from typing import List
 from math import sqrt
 from pathlib import Path
+import numpy as np
 import os
 from scripts.anchor_specialization_k_means import analyze_ratios
 
@@ -29,14 +30,19 @@ class AnchorBoxesCustom(object):
         annotation_path = os.path.join(os.getcwd(), Path('data/tdt4265_2022/train_annotations.json'))
         annotation_path = os.path.join(os.getcwd(), Path('data/tdt4265_2022_updated/train_annotations.json'))
         
-        sizes, aspect_ratios_per_size = analyze_ratios(annotation_path, 6)
-        self.num_boxes_per_fmap = [2*len(ratios) for ratios in aspect_ratios_per_size]
+        sizes, aspect_ratios_per_size = analyze_ratios(annotation_path, aspect_ratios_per_size)
+        self.num_boxes_per_fmap = [2 + len(ratios) for ratios in aspect_ratios_per_size]
         self.aspect_ratios = aspect_ratios_per_size
         self.feature_sizes = []
 
         anchors = []
         for sidx, size in enumerate(sizes):
             bbox_sizes = []
+            wh_side = sqrt(size)
+            h = wh_side / image_shape[0]
+            w = wh_side / image_shape[1]
+            bbox_sizes.append((w, h))
+            bbox_sizes.append((w*sqrt(2), h*sqrt(2)))
             for r in aspect_ratios_per_size[sidx]:
                 w = sqrt(size / r)
                 h = r * w

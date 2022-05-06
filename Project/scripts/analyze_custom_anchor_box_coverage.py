@@ -341,8 +341,8 @@ class AnchorBoxesCustom(object):
         annotation_path = os.path.join(os.getcwd(), Path('data/tdt4265_2022/train_annotations.json'))
         #annotation_path = os.path.join(os.getcwd(), Path('data/tdt4265_2022_updated/train_annotations.json'))
         
-        sizes, aspect_ratios_per_size = analyze_ratios(annotation_path, 8)
-        self.num_boxes_per_fmap = [2*len(ratios) for ratios in aspect_ratios_per_size]
+        sizes, aspect_ratios_per_size = analyze_ratios(annotation_path, 5)
+        self.num_boxes_per_fmap = [2 + len(ratios) for ratios in aspect_ratios_per_size]
         self.aspect_ratios = [[round(ar, 3) for ar in aspect_ratios] for aspect_ratios in aspect_ratios_per_size]
         self.feature_sizes = []
         strides = []
@@ -351,7 +351,14 @@ class AnchorBoxesCustom(object):
         # size of feature and number of feature
         for sidx, size in enumerate(sizes):
             bbox_sizes = []
-            #aspect_ratios = aspect_ratios_per_size[sidx]
+            
+            wh_side = sqrt(size)
+            h = wh_side / image_shape[0]
+            w = wh_side / image_shape[1]
+            bbox_sizes.append((w, h))
+            ax.scatter(w*h*image_shape[0]*image_shape[1], 1, s=70, facecolors='dimgray', edgecolors='r')
+            bbox_sizes.append((w*sqrt(2), h*sqrt(2)))
+            ax.scatter(w*h*2*image_shape[0]*image_shape[1], 1, s=70, facecolors='dimgray', edgecolors='r')
             
             for r in self.aspect_ratios[sidx]:
                 w = sqrt(size / r)
@@ -359,9 +366,13 @@ class AnchorBoxesCustom(object):
                 h = h / image_shape[0]
                 w = w / image_shape[1]
                 bbox_sizes.append((w, h))
-                bbox_sizes.append((w*sqrt(2), h*sqrt(2)))
+                #bbox_sizes.append((w*sqrt(2), h*sqrt(2)))
+                #wh_square = sqrt(size) / (W*H)
+                #bbox_sizes.append((root_size, root_size))
+                #bbox_sizes.append((root_size*sqrt(2), root_size*sqrt(2)))
+                
                 ax.scatter(w*h*image_shape[0]*image_shape[1], r, s=70, facecolors='dimgray', edgecolors='k')
-                ax.scatter(w*h*image_shape[0]*image_shape[1]*2, r, s=70, facecolors='dimgray', edgecolors='k')
+                #ax.scatter(w*h*image_shape[0]*image_shape[1]*2, r, s=70, facecolors='dimgray', edgecolors='k')
             
             square = sqrt(size)
             fH = round(image_shape[0] / square)
