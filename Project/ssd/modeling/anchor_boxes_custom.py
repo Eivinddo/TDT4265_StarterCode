@@ -49,7 +49,6 @@ class AnchorBoxesCustom(object):
                 h = h / image_shape[0]
                 w = w / image_shape[1]
                 bbox_sizes.append((w, h))
-                bbox_sizes.append((w*sqrt(2), h*sqrt(2)))
             
             square = sqrt(size)
             fH = round(image_shape[0] / square)
