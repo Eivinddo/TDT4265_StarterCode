@@ -22,17 +22,14 @@ def annotations_to_boxes(filename, rescale_width=None, rescale_height=None):
     """
 
     dimensions_list = []
-    file = open(filename)
+    #file = open(filename)
+    file = open('data/tdt4265_2022/train_annotations.json')
     annot_data = json.load(file)
     for box in annot_data['annotations']:
         bbox = box['bbox']
         bbox_width = float(bbox[2])
         bbox_height = float(bbox[3])
         size = float(box['area'])
-        #if rescale_width and rescale_height:
-        #    size = root.find('size')
-        #    bbox_width = bbox_width * (rescale_width / int(size.find('width').text))
-        #    bbox_height = bbox_height * (rescale_height / int(size.find('height').text))
         dimensions_list.append([size, bbox_width, bbox_height])
     
     bboxes = np.array(dimensions_list)
@@ -110,12 +107,10 @@ def analyze_ratios(annotation_path, num_aspect_ratios=6):
     bboxes = annotations_to_boxes(annotation_path)
     #bins = np.arange(0, 51060, 50)
     bins = np.logspace(0, 5, 5160//50)
-    diff = np.diff(bboxes[:,0])
     hist, bin_edges = np.histogram(bboxes[:,0], bins)
     log_bin_edges = np.log(bin_edges[:-1])
     sos = signal.butter(3, 0.15, btype='highpass', output='sos')
     filtered = signal.sosfilt(sos, hist)
-    filtered_best_inds = np.argsort(filtered)[-6:]
     
     peak_inds, _ = signal.find_peaks(filtered, distance=10)
     filter_peaks = filtered[peak_inds]
@@ -129,8 +124,18 @@ def analyze_ratios(annotation_path, num_aspect_ratios=6):
         plt.figure()
         plt.plot(log_bin_edges, filtered)
         plt.scatter(log_bin_edges[filtered_peak_inds], filtered[filtered_peak_inds], c='r')
+        plt.title("Highpass filtered distribution of box sizes (logarithmic)")
+        plt.xlabel("Logarithm of bbox sizes ( log(size) )")
+        plt.ylabel("Number of bboxes - Highpass filtered")
+        plt.savefig("figures/distribution_of_log_sizes_hp.png")
+        plt.savefig("figures/svgs/distribution_of_log_sizes_hp.svg")
         plt.figure()
         plt.plot(log_bin_edges, hist)
+        plt.title("Distribution of box sizes (logarithmic)")
+        plt.xlabel("Logarithm of bbox sizes ( log(size) )")
+        plt.ylabel("Number of bboxes")
+        plt.savefig("figures/distribution_of_log_sizes.png")
+        plt.savefig("figures/svgs/distribution_of_log_sizes.svg")
         plt.show()
     
     bins = np.sort(sizes)
@@ -147,12 +152,8 @@ def analyze_ratios(annotation_path, num_aspect_ratios=6):
                                             num_aspect_ratios=num_aspect_ratios)
         aspect_ratios_per_size.append(sorted(aspect_ratios))
         avg_iou_perc_per_size.append(avg_iou_perc)
-
-    #print('Sizes:', bins)
-    #print('Aspect ratios generated:', [[round(ar,2) for ar in aspect_ratios_per_size[i]] for i in range(len(aspect_ratios))])
-    #print('Average IOU with anchors:', avg_iou_perc_per_size)
     
-    return sizes, aspect_ratios_per_size
+    return bins, aspect_ratios_per_size
 
 def main():
     annotation_path = "data/tdt4265_2022/train_annotations.json"

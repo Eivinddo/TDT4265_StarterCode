@@ -1,7 +1,7 @@
 from math import gamma
 from ssd.modeling import backbones, SSDFocalLoss, AnchorBoxesCustom, RetinaNet
 from tops.config import LazyCall as L
-from ssd.modeling.backbones import FPN
+from ssd.modeling.backbones import FPN2
 from .task2_3_v4 import (
     train,
     optimizer,
@@ -15,20 +15,20 @@ from .task2_3_v4 import (
 
 
 anchors = L(AnchorBoxesCustom)(
-    feature_sizes=[[32, 256], [16, 128], [8, 64], [4, 32], [2, 16], [1, 8]],
+    #feature_sizes=[[32, 256], [16, 128], [8, 64], [4, 32], [2, 16], [1, 8]],
     # Strides is the number of pixels (in image space) between each spatial position in the feature map
-    strides=[[4, 4], [8, 8], [16, 16], [32, 32], [64, 64], [128, 128]],
-    min_sizes=[[16, 16], [32, 32], [48, 48], [64, 64], [86, 86], [128, 128], [128, 400]],
-    aspect_ratios=[[2, 3, 4], [2, 3, 4], [2, 3, 4], [2, 3, 4], [2, 3, 4], [2, 3, 4]],
+    #strides=[[4, 4], [8, 8], [16, 16], [32, 32], [64, 64], [128, 128]],
+    #min_sizes=[[16, 16], [32, 32], [48, 48], [64, 64], [86, 86], [128, 128], [128, 400]],
+    #aspect_ratios=[[2, 3, 4], [2, 3, 4], [2, 3, 4], [2, 3, 4], [2, 3, 4], [2, 3, 4]],
     image_shape="${train.imshape}",
     scale_center_variance=0.1,
     scale_size_variance=0.2
 )
 
 
-backbone = L(FPN)(pretrained=True,
+backbone = L(FPN2)(pretrained=True,
                   fpn_out_channels = 256,
-                  output_feature_sizes="${anchors.feature_sizes}")
+                  anchors="${anchors}")
 
 loss_objective = L(SSDFocalLoss)(anchors="${anchors}", gamma=2)
 
