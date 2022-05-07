@@ -291,8 +291,19 @@ def analyze_ratios(annotation_path, num_aspect_ratios=6):
         plt.figure()
         plt.plot(log_bin_edges, filtered)
         plt.scatter(log_bin_edges[filtered_peak_inds], filtered[filtered_peak_inds], c='r')
+        plt.title("Highpass filtered distribution of box sizes (logarithmic)")
+        plt.xlabel("Logarithm of bbox sizes ( log(size) )")
+        plt.ylabel("Number of bboxes - Highpass filtered")
+        plt.savefig("figures/distribution_of_log_sizes_hp.png")
+        plt.savefig("figures/svgs/distribution_of_log_sizes_hp.svg")
         plt.figure()
         plt.plot(log_bin_edges, hist)
+        plt.title("Distribution of box sizes (logarithmic)")
+        plt.xlabel("Logarithm of bbox sizes ( log(size) )")
+        plt.ylabel("Number of bboxes")
+        plt.savefig("figures/distribution_of_log_sizes.png")
+        plt.savefig("figures/svgs/distribution_of_log_sizes.svg")
+        #plt.show()
     
     bins = np.sort(sizes)
     centers = (bins[1:]+bins[:-1]) / 2
@@ -301,19 +312,13 @@ def analyze_ratios(annotation_path, num_aspect_ratios=6):
     
     aspect_ratios_per_size = []
     avg_iou_perc_per_size = []
-    for idx, b in enumerate(bboxes_per_size):
+    for b in bboxes_per_size:
         aspect_ratios, avg_iou_perc =  kmeans_aspect_ratios(
                                             bboxes=b,
                                             kmeans_max_iter=kmeans_max_iter,
                                             num_aspect_ratios=num_aspect_ratios)
         aspect_ratios_per_size.append(sorted(aspect_ratios))
         avg_iou_perc_per_size.append(avg_iou_perc)
-
-    #aspect_ratios = sorted(aspect_ratios)
-
-    print('Sizes:', bins)
-    print('Aspect ratios generated:', [[round(ar,2) for ar in aspect_ratios_per_size[i]] for i in range(len(aspect_ratios_per_size))])
-    print('Average IOU with anchors:', avg_iou_perc_per_size)
     
     return bins, aspect_ratios_per_size
 
@@ -337,11 +342,9 @@ class AnchorBoxesCustom(object):
         self.scale_center_variance = scale_center_variance
         self.scale_size_variance = scale_size_variance
 
-        #annotation_path = "data/tdt4265_2022/train_annotations.json"
         annotation_path = os.path.join(os.getcwd(), Path('data/tdt4265_2022/train_annotations.json'))
-        #annotation_path = os.path.join(os.getcwd(), Path('data/tdt4265_2022_updated/train_annotations.json'))
         
-        sizes, aspect_ratios_per_size = analyze_ratios(annotation_path, 5)
+        sizes, aspect_ratios_per_size = analyze_ratios(annotation_path, aspect_ratios_per_feature_map)
         self.num_boxes_per_fmap = [2 + len(ratios) for ratios in aspect_ratios_per_size]
         self.aspect_ratios = [[round(ar, 3) for ar in aspect_ratios] for aspect_ratios in aspect_ratios_per_size]
         self.feature_sizes = []
@@ -356,9 +359,9 @@ class AnchorBoxesCustom(object):
             h = wh_side / image_shape[0]
             w = wh_side / image_shape[1]
             bbox_sizes.append((w, h))
-            ax.scatter(w*h*image_shape[0]*image_shape[1], 1, s=70, facecolors='dimgray', edgecolors='r')
+            ax.scatter(w*h*image_shape[0]*image_shape[1], 1, s=70, facecolors='dimgray', edgecolors='k')
             bbox_sizes.append((w*sqrt(2), h*sqrt(2)))
-            ax.scatter(w*h*2*image_shape[0]*image_shape[1], 1, s=70, facecolors='dimgray', edgecolors='r')
+            ax.scatter(w*h*2*image_shape[0]*image_shape[1], 1, s=70, facecolors='dimgray', edgecolors='k')
             
             for r in self.aspect_ratios[sidx]:
                 w = sqrt(size / r)
@@ -366,13 +369,8 @@ class AnchorBoxesCustom(object):
                 h = h / image_shape[0]
                 w = w / image_shape[1]
                 bbox_sizes.append((w, h))
-                #bbox_sizes.append((w*sqrt(2), h*sqrt(2)))
-                #wh_square = sqrt(size) / (W*H)
-                #bbox_sizes.append((root_size, root_size))
-                #bbox_sizes.append((root_size*sqrt(2), root_size*sqrt(2)))
                 
                 ax.scatter(w*h*image_shape[0]*image_shape[1], r, s=70, facecolors='dimgray', edgecolors='k')
-                #ax.scatter(w*h*image_shape[0]*image_shape[1]*2, r, s=70, facecolors='dimgray', edgecolors='k')
             
             square = sqrt(size)
             fH = round(image_shape[0] / square)
@@ -405,13 +403,13 @@ class AnchorBoxesCustom(object):
         print("aspect_ratios:", self.aspect_ratios)
         print("image_shape:", image_shape)
 
-
+plt.figure()
 with open('figures/box_size_and_ar.pkl', 'rb') as file:
     ax = pickle.load(file)
 
 anchors = AnchorBoxesCustom(
     image_shape=(128,1024),
-    aspect_ratios_per_feature_map=8,
+    aspect_ratios_per_feature_map=5,
     scale_center_variance=0.1,
     scale_size_variance=0.2,
     ax=ax

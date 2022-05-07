@@ -13,12 +13,16 @@ class AnchorBoxesCustom(object):
             image_shape: tuple,
             aspect_ratios_per_size: int,
             scale_center_variance: float,
-            scale_size_variance: float):
+            scale_size_variance: float,
+            annotation_path: str):
         """Generate SSD anchors Boxes.
             It returns the center, height and width of the anchors. The values are relative to the image size
             Args:
                 image_shape: tuple of (image height, width)
-                feature_sizes: each tuple in the list is the feature shape outputted by the backbone (H, W)
+                aspect_ratios_per_size: int. Number of aspect ratios to calculate per feature map,
+                scale_center_variance: float,
+                scale_size_variance: float,
+                annotation_path: str. Path to annotation file that anchor boxes are customized to):
             Returns:
                 anchors (num_priors, 4): The prior boxes represented as [[center_x, center_y, w, h]]. All the values
                     are relative to the image size.
@@ -26,10 +30,8 @@ class AnchorBoxesCustom(object):
         self.scale_center_variance = scale_center_variance
         self.scale_size_variance = scale_size_variance
 
-        #annotation_path = "data/tdt4265_2022/train_annotations.json"
-        annotation_path = os.path.join(os.getcwd(), Path('data/tdt4265_2022/train_annotations.json'))
-        annotation_path = os.path.join(os.getcwd(), Path('data/tdt4265_2022_updated/train_annotations.json'))
-        
+        annotation_path = os.path.join(os.getcwd(), Path(annotation_path))
+                
         sizes, aspect_ratios_per_size = analyze_ratios(annotation_path, aspect_ratios_per_size)
         self.num_boxes_per_fmap = [2 + len(ratios) for ratios in aspect_ratios_per_size]
         self.aspect_ratios = aspect_ratios_per_size
