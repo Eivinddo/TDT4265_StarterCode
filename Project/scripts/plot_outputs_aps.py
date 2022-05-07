@@ -10,6 +10,10 @@ def create_pretty_names(names):
             pretty_name = 'Task 2.1'
         elif name == 'task2_4_min_sizes_v3':
             pretty_name = 'Task 2.4 (min_sizes and a.r.)'
+        elif name == 'task2_4_alpha_800_900':
+            pretty_name = 'Task 2.4, lowered alpha'
+        elif name == 'task2_4_alpha_1100_1050':
+            pretty_name = 'Task 2.4, increased alpha'
         else:
             pretty_name = name.replace('_', '.')
             pretty_name = pretty_name.replace('v', '')
@@ -36,6 +40,7 @@ coco_map = {}
 rider_ap = {}
 bus_ap = {}
 person_ap = {}
+car_ap = {}
 
 for file_name in file_names:
     loss_class[file_name] = {}
@@ -44,6 +49,7 @@ for file_name in file_names:
     rider_ap[file_name] = {}
     bus_ap[file_name] = {}
     person_ap[file_name] = {}
+    car_ap[file_name] = {}
 
     file = open(f'outputs/{file_name}/logs/scalars.json', 'r')
 
@@ -54,6 +60,7 @@ for file_name in file_names:
             rider_ap[file_name][int(data['global_step'])] = float(data['metrics/AP_rider'])
             bus_ap[file_name][int(data['global_step'])] = float(data['metrics/AP_bus'])
             person_ap[file_name][int(data['global_step'])] = float(data['metrics/AP_person'])
+            car_ap[file_name][int(data['global_step'])] = float(data['metrics/AP_car'])
         if 'loss/total_loss' in data:
             loss_class[file_name][int(data['global_step'])] = float(data['loss/classification_loss'])
             loss_reg[file_name][int(data['global_step'])] = float(data['loss/regression_loss'])
@@ -139,4 +146,18 @@ plt.ylabel('AP')
 plt.grid()
 plt.savefig('figures/graphs/ap_person_' + '-'.join(file_names) + '.png')
 plt.savefig('figures/svgs/graphs/ap_person_' + '-'.join(file_names) + '.svg')
+plt.clf()
+
+font = {'size' : 12}
+matplotlib.rc('font', **font)
+
+plt.title(f'AP - Car')
+for i in range(len(args)//2):
+    plt.plot(list(car_ap[file_names[i]].keys()), list(car_ap[file_names[i]].values()), color=colors[i])
+plt.legend(create_pretty_names(file_names))
+plt.xlabel('Number of steps')
+plt.ylabel('AP')
+plt.grid()
+plt.savefig('figures/graphs/ap_car_' + '-'.join(file_names) + '.png')
+plt.savefig('figures/svgs/graphs/ap_car_' + '-'.join(file_names) + '.svg')
 plt.clf()
