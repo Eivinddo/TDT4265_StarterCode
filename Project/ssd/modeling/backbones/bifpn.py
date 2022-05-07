@@ -11,7 +11,7 @@ https://github.dev/tristandb/EfficientDet-PyTorch/blob/master/bifpn.py
 
 class DepthwiseSeparableConvLayer(nn.Module):
     """
-    Depthwise separable convolution block, with batch normalization and ReLU activation.
+    Depthwise separable convolution layer, with batch normalization and ReLU activation.
     The depthwise separable convolution is divided into a depthwise and a pointwise convolution.
     The depthwise convolution keeps the depth of the input -> out_channels = in_channels
     The pointwise convolution keeps the wxh of the input, and changes depth. -> kernel=1x1, stride=1, padding=0
@@ -75,6 +75,7 @@ class BiFPNLayer(nn.Module):
         self.p7_out = DepthwiseSeparableConvLayer(feature_size)
         self.p8_out = DepthwiseSeparableConvLayer(feature_size)
         
+        # Initialize weights of the BiFPN layer
         self.w1_td = torch.Tensor(2, 5)
         nn.init.kaiming_uniform_(self.w1_td, nonlinearity='relu')
         self.w1_relu = nn.ReLU()
@@ -158,7 +159,8 @@ class BiFPN(nn.Module):
         self.bifpn = nn.Sequential(*bifpns)
 
     def forward(self, x):
-        # Ignore five first "layers"/operations, befor we start "storing" at p3
+        # Pass through five first "layers"/operations
+        # Note that one layer is skipped
         for i in range(5):
             x = self.feature_extractor[i](x)
         

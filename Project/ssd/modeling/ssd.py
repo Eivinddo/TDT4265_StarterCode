@@ -3,7 +3,6 @@ import torch.nn as nn
 from .anchor_encoder import AnchorEncoder
 from torchvision.ops import batched_nms
 
-
 class SSD300(nn.Module):
     def __init__(self, 
             feature_extractor: nn.Module,
@@ -23,7 +22,7 @@ class SSD300(nn.Module):
         self.classification_heads = []
 
         # Notation from "Focal Loss for Dense Object Detection"
-        self.A = anchors.num_boxes_per_fmap[-1]           # Num anchors at each feature map
+        self.A = anchors.num_boxes_per_fmap[-1]          # Num anchors at each feature map
         self.K = self.num_classes                        # Number of classes
         # self.C = self.feature_extractor.fpn_out_channels # Number of channels per feature map
 
@@ -54,7 +53,6 @@ class SSD300(nn.Module):
         bbox_delta = torch.cat(locations, 2).contiguous()
         confidences = torch.cat(confidences, 2).contiguous()
         return bbox_delta, confidences
-
     
     def forward(self, img: torch.Tensor, **kwargs):
         """
@@ -88,7 +86,6 @@ class SSD300(nn.Module):
             predictions.append((boxes, categories, scores))
         return predictions
 
- 
 def filter_predictions(
         boxes_ltrb: torch.Tensor, confs: torch.Tensor,
         nms_iou_threshold: float, max_output: int, score_threshold: float):

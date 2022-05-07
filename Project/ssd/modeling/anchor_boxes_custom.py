@@ -1,6 +1,5 @@
 # Modified from: https://github.com/lufficc/SSD
 import torch
-from typing import List
 from math import sqrt
 from pathlib import Path
 import numpy as np
