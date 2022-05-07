@@ -1,18 +1,18 @@
-from math import gamma
-from ssd.modeling import backbones, SSDFocalLoss, AnchorBoxes
+from ssd.modeling import backbones
 from tops.config import LazyCall as L
 from .task2_2 import (
-    train,
-    optimizer,
-    schedulers,
-    anchors,
-    model,
-    data_train,
+    train, 
+    anchors, 
+    optimizer, 
+    schedulers, 
+    loss_objective,
+    model, 
+    # backbone, 
+    data_train, 
     data_val,
-    val_cpu_transform,
     train_cpu_transform,
-    label_map,
-    loss_objective
+    val_cpu_transform,
+    label_map
 )
 
 backbone = L(backbones.FPN)(pretrained=True,

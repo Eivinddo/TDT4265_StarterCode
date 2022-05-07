@@ -36,9 +36,6 @@ anchors = L(AnchorBoxes)(
     scale_size_variance=0.2
 )
 
-
-
-
 backbone = L(backbones.BasicModel)(
     output_channels=[128, 256, 128, 128, 64, 64],
     image_channels="${train.image_channels}",
@@ -67,10 +64,6 @@ data_train = dict(
     dataset=L(TDT4265Dataset)(
         img_folder=get_dataset_dir("tdt4265_2022/"),
         annotation_file="data/tdt4265_2022/train_annotations.json",
-        # transform=L(torchvision.transforms.Compose)(transforms=[
-        #     L(ToTensor)(),  # ToTensor has to be applied before conversion to anchors.
-        #     # GroundTruthBoxesToAnchors assigns each ground truth to anchors, required to compute loss in training.
-        #     L(GroundTruthBoxesToAnchors)(anchors="${anchors}", iou_threshold=0.5),])
     ),
     dataloader=L(torch.utils.data.DataLoader)(
         dataset="${..dataset}", num_workers=4, pin_memory=True, shuffle=True, batch_size="${...train.batch_size}", collate_fn=utils.batch_collate,
@@ -81,13 +74,11 @@ data_train = dict(
         L(Normalize)(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])  # Normalize has to be applied after ToTensor (GPU transform is always after CPU)
     ])
 )
+
 data_val = dict(
     dataset=L(TDT4265Dataset)(
         img_folder=get_dataset_dir("tdt4265_2022"),
         annotation_file="data/tdt4265_2022/val_annotations.json",
-        # transform=L(torchvision.transforms.Compose)(transforms=[
-        #     L(ToTensor)()
-        # ])
     ),
     dataloader=L(torch.utils.data.DataLoader)(
         dataset="${..dataset}", num_workers=4, pin_memory=True, shuffle=False, batch_size="${...train.batch_size}", collate_fn=utils.batch_collate_val
