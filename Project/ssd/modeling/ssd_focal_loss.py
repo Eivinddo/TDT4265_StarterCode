@@ -3,7 +3,6 @@ import torch
 import torch.nn.functional as F
 from tops import to_cuda
 
-
 class SSDFocalLoss(nn.Module):
     """
         Implements the loss as Focal loss from the paper
@@ -20,7 +19,6 @@ class SSDFocalLoss(nn.Module):
             requires_grad=False)
         
         self.gamma = gamma
-
 
     def _loc_vec(self, loc):
         """
@@ -51,11 +49,6 @@ class SSDFocalLoss(nn.Module):
         log_p_k = F.log_softmax(confs, dim=1)
         y_k = F.one_hot(gt_labels, num_classes).transpose(1, 2)
 
-        # print("alpha:  ", alpha.shape)
-        # print("p_k:    ", p_k.shape)
-        # print("log_p_k:", log_p_k.shape)
-        # print("y_k:    ", y_k.shape)
-
         weight = torch.pow(1. - p_k, self.gamma)
         focal = - y_k * weight * log_p_k
         loss_tmp = torch.sum(alpha * focal, dim=1)
@@ -68,8 +61,6 @@ class SSDFocalLoss(nn.Module):
         regression_loss = F.smooth_l1_loss(bbox_delta, gt_locations, reduction="sum")
         num_pos = gt_locations.shape[0]/4
         total_loss = regression_loss/num_pos + focal_loss
-        # print("Regression Loss:", regression_loss/num_pos)
-        # print("Focal Loss:     ", focal_loss)
         to_log = dict(
             regression_loss=regression_loss/num_pos,
             classification_loss=focal_loss,

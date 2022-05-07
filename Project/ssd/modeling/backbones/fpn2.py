@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torchvision
-from typing import OrderedDict, Tuple, List
+from typing import OrderedDict
 from torch.nn import functional as F
 
 

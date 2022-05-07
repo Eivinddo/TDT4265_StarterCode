@@ -23,7 +23,7 @@ class RetinaNet(nn.Module):
         self.anchor_prob_initialization = anchor_prob_initialization
         
         # Notation from "Focal Loss for Dense Object Detection"
-        self.A = anchors.num_boxes_per_fmap[-1]           # Num anchors at each feature map
+        self.A = anchors.num_boxes_per_fmap[-1]          # Num anchors at each feature map
         self.K = self.num_classes                        # Number of classes
         self.C = self.feature_extractor.fpn_out_channels # Number of channels per feature map
 
