@@ -1,4 +1,3 @@
-from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
 import json
@@ -80,6 +79,8 @@ def analyze_sizes(bboxes):
         plt.savefig("figures/distribution_of_log_sizes.png")
         plt.savefig("figures/svgs/distribution_of_log_sizes.svg")
         plt.show()
+    
+    return sizes
 
 
 def analyze_ratios(annotation_path, num_aspect_ratios=6):
