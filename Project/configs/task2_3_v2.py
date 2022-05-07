@@ -16,6 +16,3 @@ from .task2_3_v1 import (
 )
 
 loss_objective = L(SSDFocalLoss)(anchors="${anchors}", gamma=2)
-
-
-

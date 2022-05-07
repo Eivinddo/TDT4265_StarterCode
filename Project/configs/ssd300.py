@@ -9,7 +9,6 @@ from ssd import utils
 from ssd.data.transforms import Normalize, ToTensor, GroundTruthBoxesToAnchors
 from .utils import get_dataset_dir, get_output_dir
 
-
 train = dict(
     batch_size=32,
     amp=True,  # Automatic mixed precision
@@ -55,6 +54,7 @@ optimizer = L(torch.optim.SGD)(
     # Tip: Scale the learning rate by batch size! 2.6e-3 is set for a batch size of 32. use 2*2.6e-3 if you use 64
     lr=2.6e-3, momentum=0.9, weight_decay=0.0005
 )
+
 schedulers = dict(
     linear=L(LinearLR)(start_factor=0.1, end_factor=1, total_iters=500),
     multistep=L(MultiStepLR)(milestones=[], gamma=0.1)
