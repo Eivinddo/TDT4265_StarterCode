@@ -1,7 +1,7 @@
 from math import gamma
-from ssd.modeling import backbones, SSDFocalLoss, AnchorBoxes2, RetinaNet2
+from ssd.modeling import SSDFocalLoss, AnchorBoxes2, RetinaNet2
 from tops.config import LazyCall as L
-from ssd.modeling.backbones import FPN, BiFPN
+from ssd.modeling.backbones import FPN
 from .task2_3_v4 import (
     train,
     optimizer,
@@ -20,7 +20,8 @@ anchors = L(AnchorBoxes2)(
     # Strides is the number of pixels (in image space) between each spatial position in the feature map
     strides=[[4, 4], [8, 8], [16, 16], [32, 32], [64, 64], [128, 128]],
     min_sizes=[[16, 16], [32, 32], [48, 48], [64, 64], [86, 86], [128, 128], [128, 400]],
-    aspect_ratios=[[0.3, 0.5, 0.75, 2, 3, 4, 5, 6], [0.3, 0.5, 0.75, 2, 3, 4, 5, 6], [2, 3], [1.5, 2], [1.5, 2], [1.5, 1.7]],    image_shape="${train.imshape}",
+    aspect_ratios=[[0.3, 0.5, 0.75, 2, 3, 4, 5, 6], [0.3, 0.5, 0.75, 2, 3, 4, 5, 6], [2, 3], [1.5, 2], [1.5, 2], [1.5, 1.7]],
+    image_shape="${train.imshape}",
     scale_center_variance=0.1,
     scale_size_variance=0.2,
 )
