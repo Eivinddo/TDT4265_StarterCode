@@ -70,7 +70,10 @@ class FPN2(nn.Module):
         
         pyramid = OrderedDict()
         
-        # Pass x through the resnet
+        # Pass x through the resnet.
+        # Interpolation is used in order to make the output features match the feature
+        # maps that are automatically generated from the dataset.
+        
         x = self.feature_extractor[4](x)
         x = F.interpolate(x, size=self.output_feature_shape[0])
         pyramid['feat0'] = x

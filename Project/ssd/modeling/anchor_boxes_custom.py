@@ -1,4 +1,8 @@
-# Modified from: https://github.com/lufficc/SSD
+# Modified from anchor_boxes.py
+# This version of the class automatically generates the different
+# feature map sizes, aspect ratios and anchor placement by 
+# looking at the dataset.
+
 import torch
 from math import sqrt
 from pathlib import Path

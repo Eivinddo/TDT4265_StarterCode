@@ -56,7 +56,6 @@ class BasicModel(torch.nn.Module):
         )
 
         self.feature_extractor_one = torch.nn.Sequential(
-            torch.nn.ReLU(),
             torch.nn.Conv2d(
                 in_channels=self.out_channels[0],
                 out_channels=4*num_filters,
@@ -77,7 +76,6 @@ class BasicModel(torch.nn.Module):
         )
 
         self.feature_extractor_two = torch.nn.Sequential(
-            torch.nn.ReLU(),
             torch.nn.Conv2d(
                 in_channels=self.out_channels[1],
                 out_channels=8*num_filters,
@@ -99,7 +97,6 @@ class BasicModel(torch.nn.Module):
 
 
         self.feature_extractor_three = torch.nn.Sequential(
-            torch.nn.ReLU(),
             torch.nn.Conv2d(
                 in_channels=self.out_channels[2],
                 out_channels=4*num_filters,
@@ -120,7 +117,6 @@ class BasicModel(torch.nn.Module):
         )
 
         self.feature_extractor_four = torch.nn.Sequential(
-            torch.nn.ReLU(),
             torch.nn.Conv2d(
                 in_channels=self.out_channels[3],
                 out_channels=4*num_filters,
@@ -141,7 +137,6 @@ class BasicModel(torch.nn.Module):
         )
 
         self.feature_extractor_five = torch.nn.Sequential(
-            torch.nn.ReLU(),
             torch.nn.Conv2d(
                 in_channels=self.out_channels[4],
                 out_channels=4*num_filters,
