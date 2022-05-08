@@ -1,4 +1,4 @@
-from ssd.modeling import backbones, SSDFocalLoss, AnchorBoxesCustom, RetinaNet
+from ssd.modeling import SSDFocalLoss, AnchorBoxesCustom, RetinaNet
 from tops.config import LazyCall as L
 from ssd.modeling.backbones import FPN2
 from .task2_3_v4 import (
@@ -11,7 +11,6 @@ from .task2_3_v4 import (
     val_cpu_transform,
     train_cpu_transform
 )
-
 
 anchors = L(AnchorBoxesCustom)(
     image_shape="${train.imshape}",
@@ -31,6 +30,6 @@ model = L(RetinaNet)(
     feature_extractor="${backbone}",
     anchors="${anchors}",
     loss_objective="${loss_objective}",
-    num_classes=8+1,  # Add 1 for background
+    num_classes=8+1,
     anchor_prob_initialization=True
 )
