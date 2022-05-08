@@ -13,7 +13,8 @@ class RetinaNet2(nn.Module):
             anchor_prob_initialization: bool = False):
         super().__init__()
         """
-            Implements the RetinaNet network, based on SSD.
+            Implements the RetinaNet2 network, based on SSD.
+            This verson allows the user to use two different anchor box sizes.
             Backbone outputs a list of features, which are gressed to SSD output with regression/classification heads.
         """
 
@@ -30,7 +31,7 @@ class RetinaNet2(nn.Module):
         self.C = self.feature_extractor.fpn_out_channels # Number of channels per feature map
 
         # Initialize output heads that are applied to each feature map from the backbone.
-        self.classification_heads1 = nn.Sequential(
+        self.classification_heads_base = nn.Sequential(
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
@@ -38,27 +39,10 @@ class RetinaNet2(nn.Module):
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(self.C, self.K*self.A1, kernel_size=3, padding=1)
-        )
-        
-        self.regression_heads1 = nn.Sequential(
-            nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
-            
-            nn.ReLU(inplace=True),
-            nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
-            
-            nn.ReLU(inplace=True),
-            nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
-            
-            nn.ReLU(inplace=True),
-            nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
-            
-            nn.ReLU(inplace=True),
-            nn.Conv2d(self.C, 4*self.A1, kernel_size=3, padding=1)
+            nn.ReLU(inplace=True)
         )
 
-        self.classification_heads2 = nn.Sequential(
+        self.regression_heads_base = nn.Sequential(
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
             
             nn.ReLU(inplace=True),
@@ -71,27 +55,18 @@ class RetinaNet2(nn.Module):
             nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
             
             nn.ReLU(inplace=True),
-            nn.Conv2d(self.C, self.K*self.A2, kernel_size=3, padding=1)
         )
-        
-        self.regression_heads2 = nn.Sequential(
-            nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
-            
-            nn.ReLU(inplace=True),
-            nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
-            
-            nn.ReLU(inplace=True),
-            nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
-            
-            nn.ReLU(inplace=True),
-            nn.Conv2d(self.C, self.C, kernel_size=3, padding=1),
-            
-            nn.ReLU(inplace=True),
-            nn.Conv2d(self.C, 4*self.A2, kernel_size=3, padding=1)
-        )
-    
+
+        self.classification_heads1 = nn.Conv2d(self.C, self.K*self.A1, kernel_size=3, padding=1)
+        self.classification_heads2 = nn.Conv2d(self.C, self.K*self.A2, kernel_size=3, padding=1) 
+
+        self.regression_heads1 = nn.Conv2d(self.C, 4*self.A1, kernel_size=3, padding=1)
+        self.regression_heads2 = nn.Conv2d(self.C, 4*self.A2, kernel_size=3, padding=1)
+
+        self.regression_heads.append(self.regression_heads_base)
         self.regression_heads.append(self.regression_heads1)
         self.regression_heads.append(self.regression_heads2)
+        self.classification_heads.append(self.classification_heads_base)
         self.classification_heads.append(self.classification_heads1)
         self.classification_heads.append(self.classification_heads2)
         self.regression_heads = nn.ModuleList(self.regression_heads)
@@ -101,28 +76,29 @@ class RetinaNet2(nn.Module):
 
     def _init_weights(self):
         if self.anchor_prob_initialization:
-
-            # Init classification heads
-            for el in self.classification_heads:
-                for layer in el:
-                    if hasattr(layer, "weight"):
-                        nn.init.kaiming_uniform_(layer.weight, nonlinearity='relu')
-                    if hasattr(layer, "bias"):
-                        nn.init.constant_(layer.bias.data, 0)
+            for layer in self.classification_heads[0]:
+                if hasattr(layer, "weight"):
+                    nn.init.kaiming_uniform_(layer.weight, nonlinearity='relu')
+                if hasattr(layer, "bias"):
+                    nn.init.constant_(layer.bias.data, 0)
 
             # Init regression heads
-            for el in self.regression_heads:
-                for layer in el:
-                    if hasattr(layer, "weight"):
-                        nn.init.kaiming_uniform_(layer.weight, nonlinearity='relu')
-                    if hasattr(layer, "bias"):
-                        nn.init.constant_(layer.bias.data, 0)
+            for layer in self.regression_heads[0]:
+                if hasattr(layer, "weight"):
+                    nn.init.kaiming_uniform_(layer.weight, nonlinearity='relu')
+                if hasattr(layer, "bias"):
+                    nn.init.constant_(layer.bias.data, 0)
+
+            nn.init.kaiming_uniform_(self.classification_heads[1].weight, nonlinearity='relu')
+            nn.init.kaiming_uniform_(self.classification_heads[2].weight, nonlinearity='relu')
+            nn.init.constant_(self.classification_heads[1].bias.data[:], 0)
+            nn.init.constant_(self.classification_heads[2].bias.data[:], 0)
             
             p = 0.99
             b = torch.log(torch.tensor(p * (self.K - 1)/(1 - p)))
 
-            nn.init.constant_(self.classification_heads[0][-1].bias.data[:self.A1], b)
-            nn.init.constant_(self.classification_heads[1][-1].bias.data[:self.A2], b)
+            nn.init.constant_(self.classification_heads[1].bias.data[:self.A1], b)
+            nn.init.constant_(self.classification_heads[2].bias.data[:self.A2], b)
 
         else:
             layers = [self.regression_heads, self.classification_heads]
@@ -136,11 +112,11 @@ class RetinaNet2(nn.Module):
         i = 0
         for x in features:
             if i < 2:
-                bbox_delta = self.regression_heads[0](x).view(x.shape[0], 4, -1)
-                bbox_conf = self.classification_heads[0](x).view(x.shape[0], self.num_classes, -1)
-            else:
                 bbox_delta = self.regression_heads[1](x).view(x.shape[0], 4, -1)
                 bbox_conf = self.classification_heads[1](x).view(x.shape[0], self.num_classes, -1)
+            else:
+                bbox_delta = self.regression_heads[2](x).view(x.shape[0], 4, -1)
+                bbox_conf = self.classification_heads[2](x).view(x.shape[0], self.num_classes, -1)
             
             locations.append(bbox_delta)
             confidences.append(bbox_conf)
