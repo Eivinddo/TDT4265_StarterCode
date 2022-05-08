@@ -1,4 +1,6 @@
-# Modified from: https://github.com/lufficc/SSD
+# Modified version of analyze anchor box coverage in order 
+# to test the more advanced (and manual) placement of anchor
+# boxes in task 2.4
 import torch
 from typing import List
 from math import sqrt
@@ -91,7 +93,6 @@ anchors = AnchorBoxesTester2(
     # Strides is the number of pixels (in image space) between each spatial position in the feature map
     strides=[[4/2, 4/2], [8/2, 8/2], [16/2, 16/2], [32/2, 32/2], [64, 64], [128, 128]],
     min_sizes=[[16/2, 16/2], [32/2, 32/2], [48/2, 48/2], [64, 64], [86, 86], [128, 128], [128, 400]],
-    # aspect_ratios=[[0.3, 0.5, 0.75, 2, 3, 4, 5, 6], [0.3, 0.5, 0.75, 2, 3, 4, 5, 6], [2, 3], [1.5, 2], [1.5, 2], [1.5, 1.7]],
     aspect_ratios=[[0.5, 0.75, 1.3, 1.5, 2, 3, 4, 5, 6], [0.75, 1.3, 1.5, 1.8, 2, 2.5, 3, 4, 5], [2, 3], [1.5, 2], [1.5, 2], [1.2, 1.5]],
     image_shape=(128,1024),
     scale_center_variance=0.1,
