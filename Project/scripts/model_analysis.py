@@ -1,4 +1,3 @@
-from tabnanny import check
 import time
 import click
 import torch
