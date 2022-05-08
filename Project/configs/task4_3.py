@@ -21,7 +21,6 @@ anchors = L(AnchorBoxesCustom)(
     annotation_path='data/tdt4265_2022/train_annotations.json'
 )
 
-
 backbone = L(FPN2)(pretrained=True,
                   fpn_out_channels = 256,
                   anchors="${anchors}")
